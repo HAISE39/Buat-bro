@@ -1,14 +1,4 @@
---simple verification for your script.
-local verify_code = 128 * math.random(8, 26)
-local getverifycode = ''..verify_code..''
-verify_prompt = gg.prompt({'➼ Put The Code To Verify ('..getverifycode..')'},nil,{'number'})
-if verify_prompt[1] == getverifycode then
-else
-verify_error = 'verify failed, please try again.'
-print(verify_error)
-return
-gg.setVisible(true)
-end
+
 
 gg.setVisible(false)
 modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
@@ -77,6 +67,8 @@ LBMENU = gg.multiChoice({
 
 "📖 Auto Loot setta",
 
+"📖 SAVED ITEM",
+
 "🔙❌【EXIT】❌🔙",
 
 }, nil,"⏩⏩ SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.1.11 GLOBAL🇮🇩")
@@ -89,7 +81,8 @@ if LBMENU[5] == true then ls() end
 if LBMENU[6] == true then mq() end
 if LBMENU[7] == true then ale() end
 if LBMENU[8] == true then als() end
-if LBMENU[9] == true then HOME() end
+if LBMENU[9] == true then bag() end
+if LBMENU[10] == true then HOME() end
  end
 end
 
@@ -650,6 +643,67 @@ gg.editAll("17120", gg.TYPE_WORD)
 gg.editAll("4", gg.TYPE_FLOAT)
 end
 end
+
+function bag()
+nbag = gg.multiChoice({
+"🔙❌【AGUS SEDIH】❌🔙",
+
+                "📁  STORAGE",
+
+               "📁  MARKET",
+               
+         "🔙❌【EXIT】❌🔙",
+
+}, nil,"⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩")
+if nbag == nil then else
+if nbag[1] == true then ale() end
+if nbag[2] == true then BG() end
+if nbag[3] == true then BM() end
+if nbag[4] == true then HOME() end
+end
+end
+
+function BG()
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("-1;2;-1:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.toast("BUKA ENCHANTMENT")
+gg.sleep(5000)
+gg.refineNumber("-1;59;-1:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("59", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+rv = gg.getResults (1)
+local v0_0 = {}
+         v0_0 = {}
+    v0_0[1] = {}
+    v0_0[1].address = rv[1].address + 4
+    v0_0[1].flags = gg.TYPE_DWORD
+    v0_0[1].value = "12"
+    v0_0[1].freeze = false
+    gg.setValues(v0_0)
+    end
+    
+ function BM()
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("-1;2;-1:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.toast("BUKA ENCHANTMENT")
+gg.sleep(5000)
+gg.refineNumber("-1;59;-1:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("59", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+rTv = gg.getResults (1)
+local Tv0_0 = {}
+         Tv0_0 = {}
+    Tv0_0[1] = {}
+    Tv0_0[1].address = rTv[1].address + 4
+    Tv0_0[1].flags = gg.TYPE_DWORD
+    Tv0_0[1].value = "27"
+    Tv0_0[1].freeze = false
+    gg.setValues(Tv0_0)
+    end
 
 function GAMEM()
 ask = gg.choice({
