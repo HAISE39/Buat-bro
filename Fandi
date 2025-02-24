@@ -28,21 +28,7 @@ function main()
 menu = gg.multiChoice({
 "📒 AUTO LOOT DEV 24-25 ",
 
-"📁GATE 1",
 
-"📁GATE 2",
-
-"📁GATE 3",
-
-"📁GATE4",
-
-"📁GATE5",
-
-"📁GATE6",
-
-"📁GATE7",
-
-"📁GATE8",
 
 "📖 SAVED ITEM",
 
@@ -51,16 +37,9 @@ menu = gg.multiChoice({
 },nil,'⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩')
 if menu == nil then os.exit() end
 if menu[1] then stat() end
-if menu[2] then g1() end
-if menu[3] then g2() end
-if menu[4] then g3() end
-if menu[5] then g4() end
-if menu[6] then g5() end
-if menu[7] then g6() end
-if menu[8] then g7() end
-if menu[9] then g8() end
-if menu[10] then bag() end
-if menu[11] then nskill() end
+if menu[2] then gate() end
+if menu[3] then bag() end
+if menu[4] then nskill() end
 end
 
 function stat()
@@ -368,6 +347,37 @@ gg.editAll("-69,", gg.TYPE_BYTE)
 gg.editAll("17029", gg.TYPE_WORD)
 gg.editAll("4", gg.TYPE_FLOAT)
 gg.sleep(100)
+end
+end
+
+function gate()
+ng = gg.multiChoice({
+"📁GATE 1",
+
+"📁GATE 2",
+
+"📁GATE 3",
+
+"📁GATE4",
+
+"📁GATE5",
+
+"📁GATE6",
+
+"📁GATE7",
+
+"📁GATE8",
+
+}, nil,"⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩")
+if ng == nil then else
+if ng[1] == true then g1() end
+if ng[2] == true then g2() end
+if ng[3] == true then g3() end
+if ng[4] == true then g4() end
+if ng[5] == true then g5() end
+if ng[6] == true then g6() end
+if ng[7] == true then g7() end
+if ng[8] == true then g8() end
 end
 end
 
