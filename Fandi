@@ -28,7 +28,7 @@ function main()
 menu = gg.multiChoice({
 "📒 AUTO LOOT DEV 24-25 ",
 
-
+"📖 GATE",
 
 "📖 SAVED ITEM",
 
