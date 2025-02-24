@@ -2,21 +2,6 @@ T = gg.getTargetPackage ()
 if T == "com.asobimo.aurcusonline.ww" then
 
 gg.setVisible(false)
-modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
-\
-           ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
-\
-📆Dᴀᴛᴇ📆 : %Y/%m/%d\
-\
-🕛Tɪᴍᴇ🕛 : %H:%M:%S\
-\
-⏳Exᴘɪʀᴇᴅ Sᴄʀɪᴘᴛ⏳ : 0000/00/00\
-\
-           ❦ ════ •⊰❂ - ❂⊱• ════ ❦')
-gg.alert(modbyfami)
-gg.setVisible(true)
-
-gg.setVisible(false)
 gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
 
 gg.setVisible(false)
@@ -398,14 +383,21 @@ function g2()
 gg.clearResults()
 gg.setVisible(false)
 gg.setRanges(gg.REGION_JAVA_HEAP)
-gg.searchNumber("836;1008981770;1280;937:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.processResume()
+gg.searchNumber("586;1;1065353216;1008981770;1080033280;16777473:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
 revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
-gg.editAll("-1", gg.TYPE_DWORD)
+gg.editAll("-2", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.searchNumber("586;1;1066192077;1008981770;1082130432;33554689:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-2", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+
 end
 
 function g3() 
