@@ -28,7 +28,7 @@ function main()
 menu = gg.multiChoice({
 "📒 AUTO LOOT DEV 24-25 ",
 
-"📖 GATE",
+"📖  GATE",
 
 "📖 SAVED ITEM",
 
@@ -68,7 +68,7 @@ function sx1()
 gg.setVisible(false)
 gg.processResume()
 gg.toast('STAR SEARCH🔍')
-gg.searchNumber("-128", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("-72", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.processResume()
 gg.toast('LETS RUN 1 ✔️')
 gg.sleep(5000)
@@ -83,7 +83,7 @@ gg.searchFuzzy("0", gg.SIGN_FUZZY_GREATER, gg.TYPE_BYTE, 0, -1, 0)
 gg.processResume()
 gg.toast('BACK TO START')
 gg.sleep(10000)
-gg.refineNumber("-128", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("-72", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineAddress("2", -1, gg.TYPE_BYTE, gg.SIGN_EQUAL, 0, -1, 0)
 r1 = gg.getResults (1)
 gg.editAll("-72", gg.TYPE_BYTE)
