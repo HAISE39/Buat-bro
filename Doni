@@ -1,0 +1,253 @@
+T = gg.getTargetPackage ()
+if T == "com.asobimo.aurcusonline.ww" then
+
+gg.setVisible(false)
+gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
+
+gg.setVisible(false)
+modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
+\
+           ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
+\
+📆Dᴀᴛᴇ📆 : %Y/%m/%d\
+\
+🕛Tɪᴍᴇ🕛 : %H:%M:%S\
+\
+⏳Exᴘɪʀᴇᴅ Sᴄʀɪᴘᴛ⏳ : 0000/00/00\
+\
+           ❦ ════ •⊰❂ - ❂⊱• ════ ❦')
+gg.alert(modbyfami)
+gg.setVisible(true)
+
+gg.setVisible(false)
+gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
+
+local gg = gg
+
+function main()
+gg.setVisible(false)
+menu = gg.multiChoice({
+"📒 FAST SEARCH STATUS ",
+
+"📒 SETTA AREA ",
+
+"📒 NIGHT KNIGHT",
+
+"📒 CODE DUNGEON",
+
+"📒 AUTO LOOP ",
+
+},nil,'⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩')
+if menu == nil then os.exit() end
+if menu[1] then stat() end
+if menu[2] then st() end
+if menu[3] then nk() end
+if menu[4] then dg() end
+if menu[5] then lp() end
+end
+
+function stat()
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+d=gg.prompt({
+	"Select"}, {data}, {"number"})
+gg.searchNumber("211';"..d[1]..';200',gg.TYPE_DWORD)
+gg.getResults (10)
+gg.refineAddress("D8", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber(d[1], gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+r = gg.getResults (1)
+L={'◼', '◻', '◻', '◻', '◻', '◻'} 
+LD = 0
+for i=0, 6, 1 do
+	if gg.isVisible(true) and i ~= 6 then
+		gg.setVisible(false)
+	end
+	gg.sleep(1000)
+	gg.toast('Loading: '..L[1]..L[2]..L[3]..L[4]..L[5]..L[6]..' '..LD..'/120%')
+	LD = LD + 20
+	table.remove(L)
+	table.insert(L, 2, "◼")
+	if i == 6 then
+		gg.sleep(2000)
+end
+end        
+local L0_0 = {}
+         L0_0 = {}
+    L0_0[1] = {}
+    L0_0[1].address = r[1].address + -72
+    L0_0[1].flags = gg.TYPE_DWORD
+    L0_0[1].value = "999999999"
+    L0_0[1].freeze = true
+    L0_0[2] = {}
+    L0_0[2].address = r[1].address + 300
+    L0_0[2].flags = gg.TYPE_DWORD
+    L0_0[2].value = "-999"
+    L0_0[2].freeze = true
+    L0_0[3] = {}
+    L0_0[3].address = r[1].address + 304
+    L0_0[3].flags = gg.TYPE_DWORD
+    L0_0[3].value = "-999"
+    L0_0[3].freeze = true
+    L0_0[4] = {}
+    L0_0[4].address = r[1].address + 340
+    L0_0[4].flags = gg.TYPE_DWORD
+    L0_0[4].value = "-999999999"
+    L0_0[4].freeze = true
+    gg.setValues(L0_0)
+    gg.addListItems(L0_0)
+  local ox = {}
+ox= gg.prompt({
+	"Select: [5;10000]"}, {data}, {"number"})
+	gg.editAll(ox[1], 4)
+	revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+local t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+for i, v in ipairs(t) do
+	if v.flags == gg.TYPE_DWORD then
+		v.value = ox [1]
+		v.freeze = true
+	end
+end
+gg.addListItems(t)
+t = nil
+end
+
+function st()
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("15D;1D;1065353216D;1008981770D;1058642330D;1072064102D;5379D:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("168D;1D;1008981770D;1056964608D;1072064102D;1311D:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("12;1;1072064102;1056964608;1008981770;1072064102;3614:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+end
+
+function nk()
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("246;1008981770;1800;1175::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("161;1008981770;1556;1176::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("96;1008981770;3085;1174::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("1081;1008981770;1285;1164::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("95;1008981770;3081;1177::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("257D;1008981770;2569D;1074D::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("124;1008981770;2566;1178::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+end
+
+function lp()
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("119;0;16777216:13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("119", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+local t = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+for i, v in ipairs(t) do
+	if v.flags == gg.TYPE_DWORD then
+		v.value = "40"
+		v.freeze = true
+	end
+end
+gg.addListItems(t)
+t = nil
+
+gg.clearResults()
+gg.processResume()
+end
+
+
+function dg()
+gg.alert('DESKRIPSI SCRIPT DUGEONnPergi ke elmo di galleria capital dan pilih mision Minotaur\npilih mode normal dan cari angka 1 lalu pilih mode hard dan murni kan menjadi 10  jika selesai di edit kalian langsung masuk salon (tanpa frezz)NPC\n\nblacksmith search 1 pergi unhappy man murnikan78\n29 g1 shop\n50 sai 4*\n51 La release\n52 festival fan\n53 latent abi\n55 AoT =1044\n58 hello kity\n60-64,83 legit furnis\n65 e.shadow\n66 chocolate furni\n68 fish expan\n70 Cursed weap\n71 Dispel 5\n72 Obsidian=1327 \n73 haloween furni n ava\n74 snowman\n76 choco furnis\n84 schoolgirl furni\n87 starry sky wall furnis\n97 mw3 ava\n98 halloween\n99 str main int sub neck hp\n100 dex head cri body hp leg 1171 bot best pick\n101 cridmg sub men 1387\n102 dex main,def,mpr 1407\n103 hp body, gold furnis 1487\n104 roar mdef int ear 1492\n105 cri head ,matk ring 1497\n106 str sub,vit lower, def ring 1578\n107 snowman\n108 snowalls,veteran abi=1586\n109sweet furnis\n110 demist\n111 blue jp furni\n\nDungeons\n\n480ancient tower\n570 ebisu kagura\n890 alert area\n930 headway fort mime\n960 hidden cradle\n1050 library of insanity\n1109 haya\n1287 95 regilis\n1236 large ring tower\n1299 mitera\n752 tasogarep\n430 northern cape\n1360 matia cosmos\n1410 awekening quest dungeon\n1546 trex\n1606 nk hard 1625 nk expert\n\nGATES\n\n1316 g4\n1320 g5\n1420 g6\n1562 g7\n1650 g8\n\nJP DUNGEONS\n\n750 silver world\n860 nightmare world\n1044 titan expert 4*\n1136 yelow cloth piece\n1142 secret hideout\n1159 relier hard\n1171 relier maze hyumo,tiger rock\n1256 hulk n schoolgirl\n1258 seagod book/green crystal\n1265 EXP TAURUS\n1268 holy worl,holy abi\n1270 dark world\n1274 foxgirl,jp leafs\n1327 Dark Obsidian\n1331 orange pumpkin\n1328 pumpkin blu\n1330 pumpkin green\n1331 pumpkin orange\n1376 blue/red crystal\n1387 Dragon fosil\n1397 souqs mucus\n1407 Onyx\n1411 discipline world, exp mission\n1428 school girl / hearts\n1487 taurus\n1492 maze of famine\n1493 fox,silver coin of hapiness\n1497 tailwind,crystal of storm\n1502 schoolgirl\n1567 nightmare\n1573 pumpkin\n1574 large e.shadow leaf\n1578 79 latent\n1586 proof of victory')
+end
+
+else
+gg.setVisible(false)
+gg.alert("❌Not Script To Game❌")
+os.exit()
+end
+
+while true do
+if gg.isVisible(true) then
+main()
+end
+end
