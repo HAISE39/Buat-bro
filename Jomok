@@ -1,0 +1,64 @@
+gg.sleep(1000)
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+d=gg.prompt({
+	"Select"}, {data}, {"number"})
+gg.searchNumber("211';"..d[1]..';200',gg.TYPE_DWORD)
+gg.getResults (10)
+gg.refineAddress("D8", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber(d[1], gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+r = gg.getResults (1)
+L={'◼', '◻', '◻', '◻', '◻', '◻'} 
+LD = 0
+for i=0, 6, 1 do
+	if gg.isVisible(true) and i ~= 6 then
+		gg.setVisible(false)
+	end
+	gg.sleep(1000)
+	gg.toast('Loading: '..L[1]..L[2]..L[3]..L[4]..L[5]..L[6]..' '..LD..'/120%')
+	LD = LD + 20
+	table.remove(L)
+	table.insert(L, 2, "◼")
+	if i == 6 then
+		gg.sleep(2000)
+end
+end        
+local L0_0 = {}
+         L0_0 = {}
+    L0_0[1] = {}
+    L0_0[1].address = r[1].address + -72
+    L0_0[1].flags = gg.TYPE_DWORD
+    L0_0[1].value = "999999999"
+    L0_0[1].freeze = true
+    L0_0[2] = {}
+    L0_0[2].address = r[1].address + 300
+    L0_0[2].flags = gg.TYPE_DWORD
+    L0_0[2].value = "-999"
+    L0_0[2].freeze = true
+    L0_0[3] = {}
+    L0_0[3].address = r[1].address + 304
+    L0_0[3].flags = gg.TYPE_DWORD
+    L0_0[3].value = "-999"
+    L0_0[3].freeze = true
+    L0_0[4] = {}
+    L0_0[4].address = r[1].address + 340
+    L0_0[4].flags = gg.TYPE_DWORD
+    L0_0[4].value = "-999999999"
+    L0_0[4].freeze = true
+    gg.setValues(L0_0)
+    gg.addListItems(L0_0)
+  local ox = {}
+ox= gg.prompt({
+	"Select: [5;10000]"}, {data}, {"number"})
+	gg.editAll(ox[1], 4)
+	revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+local t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+for i, v in ipairs(t) do
+	if v.flags == gg.TYPE_DWORD then
+		v.value = ox [1]
+		v.freeze = true
+	end
+end
+gg.addListItems(t)
+t = nil
