@@ -2,9 +2,6 @@ T = gg.getTargetPackage ()
 if T == "com.asobimo.aurcusonline.ww" then
 
 gg.setVisible(false)
-gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
-
-gg.setVisible(false)
 modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
 \
            ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
