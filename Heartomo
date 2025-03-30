@@ -1,0 +1,162 @@
+T = gg.getTargetPackage ()
+if T == "com.asobimo.aurcusonline.ww" then
+
+gg.setVisible(false)
+gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
+
+gg.setVisible(false)
+modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
+\
+           ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
+\
+📆Dᴀᴛᴇ📆 : %Y/%m/%d\
+\
+🕛Tɪᴍᴇ🕛 : %H:%M:%S\
+\
+⏳Exᴘɪʀᴇᴅ Sᴄʀɪᴘᴛ⏳ : 0000/00/00\
+\
+           ❦ ════ •⊰❂ - ❂⊱• ════ ❦')
+gg.alert(modbyfami)
+gg.setVisible(true)
+
+gg.setVisible(false)
+gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
+
+local gg = gg
+
+function main()
+menu = gg.multiChoice({
+"📒 TP MAP Dev",
+
+"📁TP EVEHOME",
+
+"📁DEV ORE 24-25",
+
+
+},nil,'⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩')
+if menu == nil then os.exit() end
+if menu[1] then g1() end
+if menu[2] then g2() end
+if menu[3] then g3() end
+end
+
+
+function g1() 
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("404;1~3;255:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("404", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+local t = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+for i, v in ipairs(t) do
+	if v.flags == gg.TYPE_DWORD then
+		v.value = "39"
+		v.freeze = true
+	end
+end
+gg.addListItems(t)
+t = nil
+
+
+gg.sleep(2000)
+gg.clearList()
+gg.clearResults()
+end
+
+function g2() 
+gg.clearResults()
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("404;1~3;255:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("404", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+local t = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+for i, v in ipairs(t) do
+	if v.flags == gg.TYPE_DWORD then
+		v.value = "1201"
+		v.freeze = true
+	end
+end
+gg.addListItems(t)
+t = nil
+
+
+gg.sleep(2000)
+gg.clearList()
+gg.clearResults()
+end
+
+function g3() 
+gg.alert("❌Bentar Bikin Akun Tadi Salah Edit Keban Awokawokaaok❌")
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber("13;1;1069547520;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("14;1;1065353216;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("4;1;1068708659;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("12;1;1065353216;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("10;1;1067030938;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("15;1;1065353216;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.processResume()
+
+gg.searchNumber("16;1;1069547520;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+gg.clearResults()
+end
+
+
+
+else
+gg.setVisible(false)
+gg.alert("❌Not Script To Game❌")
+os.exit()
+end
+
+while true do
+if gg.isVisible(true) then
+main()
+end
+end
