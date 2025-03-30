@@ -2,9 +2,6 @@ T = gg.getTargetPackage ()
 if T == "com.asobimo.aurcusonline.ww" then
 
 gg.setVisible(false)
-gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
-
-gg.setVisible(false)
 modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
 \
            ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
@@ -32,12 +29,14 @@ menu = gg.multiChoice({
 
 "📁DEV ORE 24-25",
 
+"📁SKILL FARM CEWEK",
 
 },nil,'⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩')
 if menu == nil then os.exit() end
 if menu[1] then g1() end
 if menu[2] then g2() end
 if menu[3] then g3() end
+if menu[4] then skill() end
 end
 
 
@@ -92,7 +91,7 @@ end
 function g3() 
 gg.alert("❌Bentar Bikin Akun Tadi Salah Edit Keban Awokawokaaok❌")
 gg.setRanges(gg.REGION_JAVA_HEAP)
-gg.searchNumber("13;1;1069547520;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("13;1;1069547520;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
@@ -100,7 +99,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("14;1;1065353216;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("14;1;1065353216;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
@@ -108,7 +107,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("4;1;1068708659;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("4;1;1068708659;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
@@ -116,7 +115,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("12;1;1065353216;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("12;1;1065353216;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
@@ -124,7 +123,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("10;1;1067030938;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("10;1;1067030938;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
@@ -132,7 +131,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("15;1;1065353216;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("15;1;1065353216;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
@@ -140,13 +139,134 @@ gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("16;1;1069547520;1008981770::13", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.searchNumber("16;1;1069547520;1008981770::13", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_AUTO, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.getResults(200, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
 gg.clearResults()
 end
+function skill()
+ask = gg.choice({
+"🔙❌【LOOT EVEHOME】❌🔙",
 
+                "📁  SKILL PASIR",
+
+               "📁 SKILL BUFF LIGHT ",
+               
+               "📁  SKILL BUF FIGHT ",
+
+               "📁 SKILL WIGS",
+
+               "📁 BONUS",
+
+         "🔙❌【EXIT】❌🔙",
+
+}, nil,"⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.2.0 GLOBAL🇮🇩")
+if ask == nil then else
+if ask == 1then ask() end
+if ask == 2 then gs1() end
+if ask == 3 then gs2() end
+if ask == 4 then gs3() end
+if ask == 5 then gs4() end
+if ask == 6 then gs5() end
+if ask == 7 then HOME() end
+end
+end
+
+function gs1()
+gg.clearResults()
+gg.setVisible(false)
+gg.searchNumber("25769803776Q;6;200;0;1.0F:105", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("200", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gt= gg.getResults (1)
+local L0_3 = {}
+         L0_3 = {}
+    L0_3[1] = {}
+    L0_3[1].address = gt[1].address + 48
+    L0_3[1].flags = gg.TYPE_DWORD
+    L0_3[1].value = "10078"
+    L0_3[1].freeze = true
+    gg.setValues(L0_3)
+    gg.addListItems(L0_3)
+end
+
+function gs2()
+gg.clearResults()
+gg.setVisible(false)
+gg.searchNumber("25769803776Q;6;200;0;1.0F:105", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("200", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gt1 = gg.getResults (1)
+local L0_4 = {}
+         L0_4 = {}
+    L0_4[1] = {}
+    L0_4[1].address = gt1[1].address + 48
+    L0_4[1].flags = gg.TYPE_DWORD
+    L0_4[1].value = "10084"
+    L0_4[1].freeze = true
+    gg.setValues(L0_4)
+    gg.addListItems(L0_4)
+end
+
+function gs3()
+gg.clearResults()
+gg.setVisible(false)
+gg.searchNumber("25769803776Q;6;200;0;1.0F:105", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("200", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gt = gg.getResults (1)
+local L0_5 = {}
+         L0_5 = {}
+    L0_5[1] = {}
+    L0_5[1].address = gt[1].address + 48
+    L0_5[1].flags = gg.TYPE_DWORD
+    L0_5[1].value = "10085"
+    L0_5[1].freeze = true
+    gg.setValues(L0_5)
+    gg.addListItems(L0_5)
+end
+
+function gs4()
+gg.clearResults()
+gg.setVisible(false)
+gg.searchNumber("25769803776Q;6;200;0;1.0F:105", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("200", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gt = gg.getResults (1)
+local L0_6 = {}
+         L0_6 = {}
+    L0_6[1] = {}
+    L0_6[1].address = gt[1].address + 48
+    L0_6[1].flags = gg.TYPE_DWORD
+    L0_6[1].value = "10072"
+    L0_6[1].freeze = true
+    gg.setValues(L0_6)
+    gg.addListItems(L0_6)
+end
+
+function gs5()
+gg.clearResults()
+gg.setVisible(false)
+gg.searchNumber("25769803776Q;6;200;0;1.0F:105", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.processResume()
+gg.refineNumber("200", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gt= gg.getResults (1)
+local L0_7 = {}
+         L0_7 = {}
+    L0_7[1] = {}
+    L0_7[1].address = gt[1].address + 48
+    L0_7[1].flags = gg.TYPE_DWORD
+    L0_7[1].value = "10796"
+    L0_7[1].freeze = true
+    gg.setValues(L0_7)
+    gg.addListItems(L0_7)
+end
 
 
 else
