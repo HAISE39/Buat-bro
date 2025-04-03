@@ -23,6 +23,7 @@ gg.setVisible(true)
 local gg = gg
 
 function main()
+gg.setVisible(false)
 menu = gg.multiChoice({
 "📒 AUTO LOOT DEV 24-25 ",
 
@@ -39,6 +40,7 @@ if menu[3] then ls() end
 end
 
 function stat()
+gg.setVisible(false)
 dloot = gg.multiChoice({
 "🔙❌【LOOT DEFINITION ORE】❌🔙",
 
@@ -362,37 +364,33 @@ if sloot[3] then p2() end
 end
 end
 function p1()
-gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.setVisible(false)
+gg.processResume()
+gg.toast('STAR SEARCH🔍')
 gg.searchNumber("92", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1, 0)
-gg.sleep (2000)
+gg.processResume()
+gg.toast('LETS RUN 1 ✔️')
+gg.sleep(5000)
 gg.searchFuzzy("0", gg.SIGN_FUZZY_GREATER, gg.TYPE_BYTE, 0, -1, 0)
-gg.sleep (2000)
+gg.processResume()
+gg.toast('LETS RUN 2✔️')
+gg.sleep(5000)
 gg.searchFuzzy("0", gg.SIGN_FUZZY_GREATER, gg.TYPE_BYTE, 0, -1, 0)
-gg.sleep (3000)
+gg.processResume()
+gg.toast('LETS RUN 3✔️')
+gg.sleep(5000)
+gg.searchFuzzy("0", gg.SIGN_FUZZY_GREATER, gg.TYPE_BYTE, 0, -1, 0)
+gg.processResume()
+gg.toast('BACK TO START')
+gg.sleep(10000)
 gg.refineNumber("92", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineAddress("2", -1, gg.TYPE_BYTE, gg.SIGN_EQUAL, 0, -1, 0)
-revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
-gg.editAll("85", gg.TYPE_BYTE)
-local L0_2 = {}
-         L0_2 = {}
-    L0_2[1] = {}
-    L0_2[1].address = r[1].address + 0
-    L0_2[1].flags = gg.TYPE_BYTE
-    L0_2[1].value = "85"
-    L0_2[1].freeze = false
-    L0_2[2] = {}
-    L0_2[2].address = r[1].address + -6
-    L0_2[2].flags = gg.TYPE_FLOAT
-    L0_2[2].value = "114"
-    L0_1[2].freeze = false
-    L0_2[3] = {}
-    L0_2[3].address = r[1].address + -8
-    L0_2[3].flags = gg.TYPE_WORLD
-    L0_2[3].value = "-13.107"
-    L0_2[3].freeze = false
-    
-    gg.setValues(L0_2)
-    gg.addListItems(L0_2)
+r1 = gg.getResults (1)
+gg.editAll("90", gg.TYPE_BYTE)
+
+local t = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.addListItems(t)
+t = nil
 end
 
 function p2()
