@@ -35,13 +35,6 @@ gg.editAll("16", gg.TYPE_DWORD)
 gg.clearResults()
 gg.processResume()
 
-gg.searchNumber("1088421888", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
-gg.processResume()
-gg.refineNumber("1088421888", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
-revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
-gg.editAll("1999999999", gg.TYPE_DWORD)
-gg.clearResults()
-gg.processResume()
 
 print("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⢛⡛⠿⠛⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿")
 print("⣿⣿⣿⣿⣿⣿⣿⡿⠟⡉⣡⡖⠘⢗⣀⣀⡀⢢⣐⣤⣉⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿")
