@@ -1,6 +1,7 @@
 T = gg.getTargetPackage ()
 if T == "com.asobimo.aurcusonline.ww" then
-
+gg.alert("========App info========\nApp Name: "..gg.getTargetInfo()["name"].."\nApp Version: "..gg.getTargetInfo()["versionName"].."\nPackage Name: "..gg.getTargetInfo()["packageName"].."\nInstallation Date: "..os.date("%x", gg.getTargetInfo()["firstInstallTime"]).."\nLast Update: "..os.date("%x", gg.getTargetInfo()["lastUpdateTime"]).."\n=======================")
+Check_Login1 = gg.prompt({"⚠Enter Password⚠"},nil,{"text"}) or (function() while true do os.exit() end end)();Check_Login2 = Check_Login1[1] == "9ML5CKmBgt5k_r6" or (function() gg.alert("⚠ERRO⚠\n➡Password Wrong"); while true do os.exit() end end)() 
 
 
 gg.setVisible(false)
