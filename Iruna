@@ -55,13 +55,19 @@ end
 
 function g1()
 gg.alert("proses lagi binary")
+gg.sleep(1000)
+gg.setVisible(false)
+gg.setRanges(gg.REGION_JAVA_HEAP)
+gg.searchNumber(""..hp[1].."';'"..mp[1]..";1F",gg.TYPE_DWORD)
+gg.getResults (10)
+gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber(hp[1], gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
 end
 function g2()
 gg.sleep(1000)
-gg.clearResults()
 gg.setVisible(false)
 gg.setRanges(gg.REGION_JAVA_HEAP)
-gg.searchNumber(""..hp[1].."';'"..mp[1]..";1F:29",gg.TYPE_DWORD)
+gg.searchNumber(""..hp[1].."';'"..mp[1]..";1F",gg.TYPE_DWORD)
 gg.getResults (10)
 gg.refineAddress("4", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber(hp[1], gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
@@ -83,17 +89,11 @@ local L0_0 = {}
     L0_0[3].flags = gg.TYPE_DWORD
     L0_0[3].value = "0"
     L0_0[3].freeze = true
-gg.setValues(L0_0)
+    gg.setValues(L0_0)
     gg.addListItems(L0_0)
-gg.processResume()
 end
 function g3()
-gg.sleep(1000)
-gg.clearResults()
-gg.setVisible(false)
-gg.setRanges(gg.REGION_JAVA_HEAP)
-gg.processResume()
-gg.editAll("9999", gg.TYPE_DWORD)
+gg.editAll("1", gg.TYPE_DWORD)
 end
 function g4()
 gg.alert("proses lagi binary")
@@ -154,7 +154,6 @@ while true do
   HOMEDM = 1
   gg.setVisible(false)
   end
-  gg.clearResults()
   if HOMEDM == 1 then
   main()
  end
