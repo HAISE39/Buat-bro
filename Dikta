@@ -22,6 +22,7 @@ gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel F
 local gg = gg
 
 function main()
+gg.setVisible(false)
 menu = gg.multiChoice({
 "📒 FAST SEARCH STATUS ",
 
@@ -119,6 +120,7 @@ for i, v in ipairs(t) do
 end
 gg.addListItems(t)
 t = nil
+gg.toast('Fast Search : Actived✔️')
 end
 
 function g1() 
@@ -133,20 +135,27 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 1 : Actived✔️')
 end
 
 function g2() 
 gg.clearResults()
 gg.setVisible(false)
 gg.setRanges(gg.REGION_JAVA_HEAP)
-gg.searchNumber("586;1;1066192077;1008981770;1082;130;432;33554689:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
-gg.processResume()
+gg.searchNumber("586;1;1065353216;1008981770;1080033280;16777473:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+gg.editAll("-1", gg.TYPE_DWORD)
+
+gg.clearResults()
+gg.searchNumber("586;1;1066192077;1008981770;1082130432;33554689:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
 gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
 revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
 gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 2 : Actived✔️')
 end
 
 function g3() 
@@ -161,6 +170,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 3 : Actived✔️')
 end
 
 function g4()
@@ -175,6 +185,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 4 : Actived✔️')
 end
 
 function g5()
@@ -189,6 +200,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 5 : Actived✔️')
 end
 
 function g6()
@@ -203,6 +215,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 6 : Actived✔️')
 end
 
 function g7()
@@ -217,6 +230,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 7 : Actived✔️')
 end
 
 function g8 () 
@@ -231,6 +245,7 @@ gg.editAll("-1", gg.TYPE_DWORD)
 
 gg.clearResults()
 gg.processResume()
+gg.toast('Area Gate 8 : Actived✔️')
 end
 
 else
