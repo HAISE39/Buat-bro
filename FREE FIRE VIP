@@ -275,6 +275,18 @@ gg.setVisible(false)
 running = true
 TEMPLATE = 1
 
+local FAMI3 = os.clock()
+gg.setVisible(false)
+gg.sleep(1200)
+gg.alert("●"..string.format("⏳Process⏳ %.1f", os.clock() - FAMI3).." Seconds")
+gg.setVisible(true)
+
+if os.date("%Y%m%d") > "20250520" then
+gg.setVisible(false)
+gameguardianph=gg.alert("❌Script Expired❌\nBeli Vip Script : 6285706400133")
+os.exit()
+end
+
 function HOME()
 gg.setVisible(false)
 pogi = gg.multiChoice({
