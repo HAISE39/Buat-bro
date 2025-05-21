@@ -39,6 +39,7 @@ gg.alert("©VIP SCRIPT VELLIXAO FOR ARI\n©THIS SCRIPT IS FOR USE WITH THE PANEL
 local gg = gg
 
 function main()
+gg.setVisible(false)
 menu = gg.multiChoice({
 "📒 FAST SEARCH STATUS ",
 
@@ -1394,6 +1395,7 @@ gg.clearResults()
 gg.processResume()
 end
 function bag()
+gg.setVisible(false)
 nbag = gg.multiChoice({
 "🔙❌【AGUS SEDIH】❌🔙",
 
@@ -1431,6 +1433,7 @@ local v0_0 = {}
     v0_0[1].value = "12"
     v0_0[1].freeze = false
     gg.setValues(v0_0)
+gg.clearResults()
     end
     
  function BM()
@@ -1452,6 +1455,7 @@ local Tv0_0 = {}
     Tv0_0[1].value = "27"
     Tv0_0[1].freeze = false
     gg.setValues(Tv0_0)
+gg.clearResults()
     end
 function jm23()
 print("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⢛⡛⠿⠛⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿")
