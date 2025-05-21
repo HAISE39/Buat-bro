@@ -1,14 +1,5 @@
 T = gg.getTargetPackage ()
 if T == "com.asobimo.aurcusonline.ww" then
--- Anti bypass : string.match ; string.find ; tostring ; string.gmatch
-local checkanti = "@storage";local _0x003;local _0x002;local _0x001;_0x002 = 1000;if not string.match(checkanti, "@") or not string.find(checkanti, "@") or tostring(checkanti) ~= "@storage" then _0x001 = true end;if _0x001 then os.exit() _0x002 = 6677 end;while ((_0x002==6677) and _0x001) do gg.alert("Log cc") ;end 
-local yhsk1,yhsk2 = {},{};function a1()end;function a2()end
-for ii,ll in tostring(_ENV):gmatch("%['a(%d+)'%]([^\n]+),") do
-table.insert(yhsk1,ii) ; table.insert(yhsk2,ll)end
-local checki = table.concat(yhsk2):gsub("@","1123",1):gsub("@","1435")
-if tonumber(table.concat(yhsk1)) ~= 12 and not checki:find("1123") and not checki:find("1435") then
-return gg.alert("GA USAH GOBLOK BANG")
-end
 if true then
     local search = gg.searchNumber
     local func = function(...)
