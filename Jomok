@@ -20,6 +20,22 @@ gg.setVisible(true)
 gg.setVisible(false)
 gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel Free")
 
+if true then
+    local search = gg.searchNumber
+    local func = function(...)
+        gg.setVisible(false)
+        local tab = search(...)
+        if gg.isVisible() then
+            gg.setVisible(false)
+            gg.alert("[💢] Ga Usah Di Intip Bang!")
+            gg.sleep("1000")
+            gg.processKill()
+        end
+        return tab
+    end
+    gg.searchNumber = func
+end
+
 function HOME()
 gg.setVisible(false)
 HOMEMENU = gg.choice({
