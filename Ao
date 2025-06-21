@@ -17,7 +17,13 @@ if true then
     gg.searchNumber = func
 end
 
-
+function matrixIntro()
+  local text = "SCRIPT PATCH GAME GUARDIAN BY VELLIXAO"
+  for i = 1, #text do
+    gg.toast(text:sub(1, i))
+    gg.sleep(100)
+  end
+end
 
 gg.setVisible(false)
 modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
@@ -40,7 +46,7 @@ gg.alert("©Hack\n©YouTube : VELLIX_AO\n©Fb: Kurol watu\n©Subscribe Channel F
 function HOME()
 gg.setVisible(false)
 HOMEMENU = gg.choice({
-"____MENU____",
+"____BYPASS____",
 
 "📁 UNTUK FARM ",
 
@@ -61,7 +67,7 @@ HOMEMENU = gg.choice({
 "🔚【EXIT】🔚",
 
 }, nil,"⏩⏩SCRIPT VIP VELLIX_AO⏪⏪\nVELLIX_AO Aurcus Online\n🇮🇩 Aurcus 3.1.11 GLOBAL🇮🇩")
-if HOMEMENU == 1 then HOME()
+if HOMEMENU == 1 then BYPASS0()
  end
 if HOMEMENU == 2 then LOBYM()
  end
@@ -82,6 +88,79 @@ if HOMEMENU == 6 then GAMEZ()
 if HOMEMENU == 10 then Exit()
  end
 HOMEDM = -1
+end
+
+function BYPASS0()
+  local menudebug = gg.choice({
+    "1. Anti Force Close Saat Login",
+    "2. Stabilizer Saat Pindah Map",
+    "3. Clear Memory Manual",
+    "4. Keluar"
+  }, nil, "Aurcus Online | Script Stabilizer")
+
+  if menudebug == 1 then
+    antiLogin()
+  elseif menudebug == 2 then
+    mapStabilizer()
+  elseif menudebug == 3 then
+    clearMemory()
+  elseif menudebug == 4 then
+    HOME()
+  end
+end
+
+function antiLogin()
+  gg.clearResults()
+  gg.searchNumber("1337;1;0;0::17", gg.TYPE_DWORD)
+  gg.refineNumber("1337")
+  local r = gg.getResults(10)
+  for i, v in ipairs(r) do
+    v.value = "0"
+    v.freeze = true
+  end
+  gg.addListItems(r)
+  gg.toast("Anti Force Close Login Aktif")
+end
+
+function mapStabilizer()
+  gg.setVisible(false)
+
+function disableGGDetection()
+  gg.setRanges(gg.REGION_CODE_APP | gg.REGION_JAVA_HEAP)
+  gg.searchNumber("4761214;1162690580::17", gg.TYPE_DWORD) -- Nilai acak yang sering muncul dari libgg
+  gg.clearResults()
+  gg.toast("Bypass Deteksi GG Aktif")
+end
+
+function advancedMapStabilizer()
+ 
+  gg.clearResults()
+  gg.setRanges(gg.REGION_C_ALLOC)
+  gg.searchNumber("20000000~60000000", gg.TYPE_DWORD)
+  local res = gg.getResults(20)
+  for i, v in ipairs(res) do
+    v.value = "0"
+    v.freeze = true
+  end
+  gg.addListItems(res)
+  gg.toast("Advanced Stabilizer Aktif")
+end
+
+disableGGDetection()
+advancedMapStabilizer()
+gg.setVisible(false)
+gg.clearResults()
+gg.setRanges(gg.REGION_C_DATA)
+gg.searchNumber("gg", gg.TYPE_BYTE)
+gg.clearResults()
+gg.clearList()
+gg.toast("Map Crash Protection Siap. Sekarang coba pindah map.")
+end
+
+function clearMemory()
+  gg.clearResults()
+  gg.clearList()
+  gg.toast("Memory Game Guardian Dibersihkan")
 end
 
 function LOBYM()
