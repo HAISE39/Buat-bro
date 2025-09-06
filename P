@@ -1,120 +1,17 @@
 -- ==========================================
--- Precision Damage Multiplier Script
--- Berdasarkan analisis IL2CPP MobPrefabSetting & ProtegePrefabSetting
--- Namespace-aware dan field-specific
+-- GetDamage Method Multiplier Script
+-- Berdasarkan offset: 0x2AF4AD4 (GetDamage method)
 -- ==========================================
 
 gg.setRanges(gg.REGION_C_ALLOC | gg.REGION_CODE_APP)
 gg.clearResults()
 
--- Konfigurasi berdasarkan namespace yang benar
+-- Konfigurasi
 local LIB_NAME = "libil2cpp.so"
-local MOB_NAMESPACE = "MobPrefabSetting"
-local PROTEGE_NAMESPACE = "ProtegePrefabSetting"
-
--- Field addresses berdasarkan namespace yang tepat
-local MOB_FIELDS = {
-    {
-        name = "DisableDamageMotionAtSkillBreak",
-        offset = 0xB4, 
-        type = gg.TYPE_BOOL,
-        namespace = MOB_NAMESPACE,
-        description = "Nonaktifkan motion damage saat skill break"
-    },
-    {
-        name = "DamageEffectSetColor", 
-        offset = 0xB5,
-        type = gg.TYPE_BOOL,
-        namespace = MOB_NAMESPACE,
-        description = "Aktifkan warna custom untuk efek damage"
-    },
-    {
-        name = "DamageEffectColor_R",
-        offset = 0xB8,
-        type = gg.TYPE_FLOAT,
-        namespace = MOB_NAMESPACE,
-        description = "Warna Red efek damage"
-    },
-    {
-        name = "DamageEffectColor_G",
-        offset = 0xBC, 
-        type = gg.TYPE_FLOAT,
-        namespace = MOB_NAMESPACE,
-        description = "Warna Green efek damage"
-    },
-    {
-        name = "DamageEffectColor_B",
-        offset = 0xC0,
-        type = gg.TYPE_FLOAT,
-        namespace = MOB_NAMESPACE,
-        description = "Warna Blue efek damage"
-    },
-    {
-        name = "DeadSinkSpeed",
-        offset = 0xE0,
-        type = gg.TYPE_FLOAT,
-        namespace = MOB_NAMESPACE,
-        description = "Kecepatan sink karakter mati"
-    }
-}
-
-local PROTEGE_FIELDS = {
-    {
-        name = "DamageEffectSetColor",
-        offset = 0x84,
-        type = gg.TYPE_BOOL,
-        namespace = PROTEGE_NAMESPACE,
-        description = "Aktifkan warna custom efek damage (Protege)"
-    },
-    {
-        name = "DamageEffectColor_R",
-        offset = 0x88,
-        type = gg.TYPE_FLOAT,
-        namespace = PROTEGE_NAMESPACE,
-        description = "Warna Red efek damage (Protege)"
-    },
-    {
-        name = "DamageEffectColor_G",
-        offset = 0x8C,
-        type = gg.TYPE_FLOAT,
-        namespace = PROTEGE_NAMESPACE,
-        description = "Warna Green efek damage (Protege)"
-    },
-    {
-        name = "DamageEffectColor_B",
-        offset = 0x90,
-        type = gg.TYPE_FLOAT,
-        namespace = PROTEGE_NAMESPACE,
-        description = "Warna Blue efek damage (Protege)"
-    }
-}
-
--- Method offsets untuk hooking
-local METHOD_OFFSETS = {
-    {
-        name = "GetDisableDamageMotionAtSkillBreak",
-        offset = 0x2F22A58,
-        type = gg.TYPE_DWORD,
-        namespace = MOB_NAMESPACE,
-        description = "Method untuk disable damage motion"
-    },
-    {
-        name = "GetDamageEffectPath", 
-        offset = 0x2E2E354,
-        type = gg.TYPE_DWORD,
-        namespace = MOB_NAMESPACE,
-        description = "Method untuk path efek damage"
-    }
-}
-
--- Gabungkan semua field
-local ALL_FIELDS = {}
-for _, field in ipairs(MOB_FIELDS) do table.insert(ALL_FIELDS, field) end
-for _, field in ipairs(PROTEGE_FIELDS) do table.insert(ALL_FIELDS, field) end
-for _, method in ipairs(METHOD_OFFSETS) do table.insert(ALL_FIELDS, method) end
+local GET_DAMAGE_OFFSET = 0x2AF4AD4
 
 -- Variabel global
-local original_values = {}
+local original_bytes = {}
 local base_address = 0
 local current_multiplier = 1.0
 local is_active = false
@@ -129,150 +26,155 @@ function get_base_address()
     return ranges[1].start
 end
 
--- Backup nilai original berdasarkan namespace
-function backup_namespace_values()
+-- Backup original bytes dari method GetDamage
+function backup_getdamage_method()
     base_address = get_base_address()
-    original_values = {}
+    local method_address = base_address + GET_DAMAGE_OFFSET
     
-    for _, field in ipairs(ALL_FIELDS) do
-        local success, result = pcall(function()
-            return gg.getValues({{address = base_address + field.offset, flags = field.type}})[1].value
-        end)
-        
-        if success then
-            original_values[field.name] = {
-                address = base_address + field.offset,
-                value = result,
-                flags = field.type,
-                namespace = field.namespace,
-                description = field.description
-            }
-        end
-    end
+    -- Backup 12 bytes pertama dari method
+    original_bytes = gg.getValues({
+        {address = method_address, flags = gg.TYPE_DWORD},
+        {address = method_address + 4, flags = gg.TYPE_DWORD},
+        {address = method_address + 8, flags = gg.TYPE_DWORD}
+    })
     
-    gg.toast("✅ Backup berhasil: " .. #ALL_FIELDS .. " field")
-end
-
--- Menu untuk memilih field berdasarkan namespace
-function select_field_menu()
-    local menu_options = {}
-    local field_map = {}
-    
-    -- Group oleh namespace
-    local namespace_groups = {
-        [MOB_NAMESPACE] = {},
-        [PROTEGE_NAMESPACE] = {},
-        ["METHODS"] = {}
-    }
-    
-    for _, field in ipairs(ALL_FIELDS) do
-        local group = field.namespace
-        if field.name:find("Get") then group = "METHODS" end
-        
-        local menu_text = "🎯 " .. field.name
-        if field.namespace == PROTEGE_NAMESPACE then
-            menu_text = menu_text .. " (Protege)"
-        end
-        
-        table.insert(namespace_groups[group], {
-            text = menu_text,
-            field = field
-        })
-    end
-    
-    -- Build menu options
-    table.insert(menu_options, "📁 " .. MOB_NAMESPACE)
-    for _, item in ipairs(namespace_groups[MOB_NAMESPACE]) do
-        table.insert(menu_options, "   • " .. item.text)
-        field_map[#menu_options] = item.field
-    end
-    
-    table.insert(menu_options, "📁 " .. PROTEGE_NAMESPACE)
-    for _, item in ipairs(namespace_groups[PROTEGE_NAMESPACE]) do
-        table.insert(menu_options, "   • " .. item.text)
-        field_map[#menu_options] = item.field
-    end
-    
-    table.insert(menu_options, "📁 METHODS")
-    for _, item in ipairs(namespace_groups["METHODS"]) do
-        table.insert(menu_options, "   • " .. item.text)
-        field_map[#menu_options] = item.field
-    end
-    
-    table.insert(menu_options, "🔙 Kembali")
-    
-    local choice = gg.choice(menu_options, nil, "🎮 PILIH FIELD UNTUK MULTIPLIER\nNamespace-aware Selection")
-    
-    if choice == nil or choice == #menu_options then
-        return nil
-    end
-    
-    return field_map[choice]
-end
-
--- Apply multiplier ke field tertentu
-function apply_field_multiplier(field, multiplier)
-    if not original_values[field.name] then
-        gg.alert("❌ Field " .. field.name .. " belum di-backup!")
-        return false
-    end
-    
-    local original_value = original_values[field.name].value
-    local new_value = original_value
-    
-    if field.type == gg.TYPE_FLOAT or field.type == gg.TYPE_DWORD then
-        new_value = original_value * multiplier
-    elseif field.type == gg.TYPE_BOOL then
-        new_value = 1  -- Force true untuk boolean
-    end
-    
-    gg.setValues({{
-        address = original_values[field.name].address,
-        value = new_value,
-        flags = field.type
-    }})
-    
-    gg.toast("✅ " .. field.name .. " di-set ke: " .. new_value)
+    gg.toast("✅ Backup GetDamage method berhasil")
     return true
 end
 
--- Menu multiplier untuk field tertentu
-function field_multiplier_menu(selected_field)
+-- Apply damage multiplier dengan ARM assembly patching
+function apply_damage_multiplier(multiplier)
+    local method_address = base_address + GET_DAMAGE_OFFSET
+    
+    if multiplier == 1.0 then
+        -- Kembalikan ke original (revert)
+        gg.setValues(original_bytes)
+        gg.toast("✅ Damage multiplier dinonaktifkan")
+        is_active = false
+        current_multiplier = 1.0
+        return true
+    end
+
+    -- ARM assembly untuk return value * multiplier
+    local new_bytes = {}
+    
+    if multiplier == 2.0 then
+        -- x2: LSL R0, R0, #1 (Logical Shift Left untuk multiply 2)
+        new_bytes = {
+            {address = method_address, value = 0xE1A00080, flags = gg.TYPE_DWORD}, -- LSL R0, R0, #1
+            {address = method_address + 4, value = 0xE12FFF1E, flags = gg.TYPE_DWORD}, -- BX LR (return)
+            {address = method_address + 8, value = 0x00000000, flags = gg.TYPE_DWORD}  -- NOP
+        }
+    elseif multiplier == 5.0 then
+        -- x5: MOV R1, #5 -> MUL R0, R0, R1
+        new_bytes = {
+            {address = method_address, value = 0xE3A01005, flags = gg.TYPE_DWORD}, -- MOV R1, #5
+            {address = method_address + 4, value = 0xE0000190, flags = gg.TYPE_DWORD}, -- MUL R0, R0, R1
+            {address = method_address + 8, value = 0xE12FFF1E, flags = gg.TYPE_DWORD}  -- BX LR
+        }
+    elseif multiplier == 10.0 then
+        -- x10: MOV R1, #10 -> MUL R0, R0, R1
+        new_bytes = {
+            {address = method_address, value = 0xE3A0100A, flags = gg.TYPE_DWORD}, -- MOV R1, #10
+            {address = method_address + 4, value = 0xE0000190, flags = gg.TYPE_DWORD}, -- MUL R0, R0, R1
+            {address = method_address + 8, value = 0xE12FFF1E, flags = gg.TYPE_DWORD}  -- BX LR
+        }
+    else
+        -- Custom multiplier
+        local multiplier_int = math.floor(multiplier)
+        local opcode1 = 0xE3A01000 + multiplier_int -- MOV R1, #multiplier
+        local opcode2 = 0xE0000190 -- MUL R0, R0, R1
+        local opcode3 = 0xE12FFF1E -- BX LR
+        
+        new_bytes = {
+            {address = method_address, value = opcode1, flags = gg.TYPE_DWORD},
+            {address = method_address + 4, value = opcode2, flags = gg.TYPE_DWORD},
+            {address = method_address + 8, value = opcode3, flags = gg.TYPE_DWORD}
+        }
+    end
+
+    -- Apply patch
+    gg.setValues(new_bytes)
+    is_active = true
+    current_multiplier = multiplier
+    gg.toast("✅ Damage multiplier x" .. multiplier .. " diaktifkan")
+    return true
+end
+
+-- Verifikasi method GetDamage
+function verify_getdamage_method()
+    local method_address = base_address + GET_DAMAGE_OFFSET
+    local current_bytes = gg.getValues({
+        {address = method_address, flags = gg.TYPE_DWORD},
+        {address = method_address + 4, flags = gg.TYPE_DWORD}
+    })
+    
+    -- Check jika method sudah di-patch
+    if current_bytes[1].value == original_bytes[1].value and 
+       current_bytes[2].value == original_bytes[2].value then
+        return true -- Masih original
+    else
+        return false -- Sudah di-modifikasi
+    end
+end
+
+-- Menu utama
+function main_menu()
     while true do
         local menu_options = {
-            "⚡ Multiplier x2 - " .. selected_field.name,
-            "⚡ Multiplier x5 - " .. selected_field.name,
-            "⚡ Multiplier x10 - " .. selected_field.name,
+            "🔹 Backup GetDamage Method",
+            "⚡ Multiplier x2 Damage",
+            "⚡ Multiplier x5 Damage", 
+            "⚡ Multiplier x10 Damage",
             "🔧 Custom Multiplier",
-            "↩️ Kembali ke nilai original",
-            "🔙 Kembali ke menu utama"
+            "🔄 Reset ke Original",
+            "🔍 Status Method",
+            "❌ Keluar"
         }
         
-        local choice = gg.choice(menu_options, nil, "🎮 MULTIPLIER UNTUK: " .. selected_field.name .. 
-            "\nNamespace: " .. selected_field.namespace ..
-            "\nDeskripsi: " .. selected_field.description)
+        local choice = gg.choice(menu_options, nil, "🎮 GETDAMAGE MULTIPLIER\n" ..
+            "Status: " .. (is_active and "AKTIF x" .. current_multiplier or "NON-AKTIF") ..
+            "\nOffset: 0x" .. string.format("%X", GET_DAMAGE_OFFSET))
         
         if choice == nil then break end
         
         if choice == 1 then
-            apply_field_multiplier(selected_field, 2.0)
+            if backup_getdamage_method() then
+                gg.alert("✅ GetDamage method berhasil di-backup!\n" ..
+                         "Address: 0x" .. string.format("%X", base_address + GET_DAMAGE_OFFSET))
+            end
         elseif choice == 2 then
-            apply_field_multiplier(selected_field, 5.0)
+            if verify_getdamage_method() then
+                apply_damage_multiplier(2.0)
+            else
+                gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
+            end
         elseif choice == 3 then
-            apply_field_multiplier(selected_field, 10.0)
+            if verify_getdamage_method() then
+                apply_damage_multiplier(5.0)
+            else
+                gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
+            end
         elseif choice == 4 then
-            local custom = gg.prompt("Masukkan custom multiplier:", {1.0}, {"number"})
-            if custom and custom[1] then
-                apply_field_multiplier(selected_field, custom[1])
+            if verify_getdamage_method() then
+                apply_damage_multiplier(10.0)
+            else
+                gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
             end
         elseif choice == 5 then
-            gg.setValues({{
-                address = original_values[selected_field.name].address,
-                value = original_values[selected_field.name].value,
-                flags = selected_field.type
-            }})
-            gg.toast("✅ " .. selected_field.name .. " dikembalikan ke original")
+            local custom = gg.prompt("Masukkan custom multiplier:", {10}, {"number"})
+            if custom and custom[1] and custom[1] > 0 then
+                if verify_getdamage_method() then
+                    apply_damage_multiplier(custom[1])
+                else
+                    gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
+                end
+            end
         elseif choice == 6 then
+            apply_damage_multiplier(1.0) -- Reset ke original
+        elseif choice == 7 then
+            show_method_status()
+        elseif choice == 8 then
             break
         end
         
@@ -280,104 +182,55 @@ function field_multiplier_menu(selected_field)
     end
 end
 
--- Tampilkan info field yang available
-function show_field_info()
-    local info_text = "📊 FIELD INFORMATION:\n\n"
+-- Tampilkan status method
+function show_method_status()
+    local method_address = base_address + GET_DAMAGE_OFFSET
+    local current_bytes = gg.getValues({
+        {address = method_address, flags = gg.TYPE_DWORD},
+        {address = method_address + 4, flags = gg.TYPE_DWORD},
+        {address = method_address + 8, flags = gg.TYPE_DWORD}
+    })
     
-    info_text = info_text .. "📁 " .. MOB_NAMESPACE .. ":\n"
-    for _, field in ipairs(MOB_FIELDS) do
-        info_text = info_text .. "• " .. field.name .. " (" .. field.description .. ")\n"
+    local status_text = "📊 GETDAMAGE METHOD STATUS:\n\n"
+    status_text = status_text .. "📍 Address: 0x" .. string.format("%X", method_address) .. "\n"
+    status_text = status_text .. "📏 Offset: 0x" .. string.format("%X", GET_DAMAGE_OFFSET) .. "\n"
+    status_text = status_text .. "🔧 Status: " .. (is_active and "AKTIF" or "ORIGINAL") .. "\n"
+    
+    if is_active then
+        status_text = status_text .. "🎯 Multiplier: x" .. current_multiplier .. "\n"
     end
     
-    info_text = info_text .. "\n📁 " .. PROTEGE_NAMESPACE .. ":\n"
-    for _, field in ipairs(PROTEGE_FIELDS) do
-        info_text = info_text .. "• " .. field.name .. " (" .. field.description .. ")\n"
-    end
+    status_text = status_text .. "\n📝 Bytes saat ini:\n"
+    status_text = status_text .. "0x" .. string.format("%X", current_bytes[1].value) .. "\n"
+    status_text = status_text .. "0x" .. string.format("%X", current_bytes[2].value) .. "\n"
+    status_text = status_text .. "0x" .. string.format("%X", current_bytes[3].value)
     
-    info_text = info_text .. "\n⚙️ METHODS:\n"
-    for _, method in ipairs(METHOD_OFFSETS) do
-        info_text = info_text .. "• " .. method.name .. " (" .. method.description .. ")\n"
-    end
-    
-    gg.alert(info_text)
+    gg.alert(status_text)
 end
-
--- Revert semua field ke original
-function revert_all_fields()
-    for name, data in pairs(original_values) do
-        gg.setValues({{
-            address = data.address,
-            value = data.value,
-            flags = data.flags
-        }})
-    end
-    gg.toast("✅ Semua field dikembalikan ke nilai original")
-end
-
--- Main menu dengan pilihan berdasarkan namespace
-function namespace_based_menu()
-    while true do
-        local menu_options = {
-            "🔹 Backup Semua Field (" .. #ALL_FIELDS .. " field)",
-            "🎯 Pilih Field untuk Multiplier",
-            "⚡ Quick Multiplier - DisableDamageMotion",
-            "⚡ Quick Multiplier - DamageEffectColor", 
-            "📊 Info Field yang Tersedia",
-            "↩️ Revert Semua ke Original",
-            "❌ Keluar"
-        }
-        
-        local choice = gg.choice(menu_options, nil, "🎮 NAMESPACE-BASED DAMAGE MULTIPLIER\n" ..
-            "Mob Fields: " .. #MOB_FIELDS .. " | Protege Fields: " .. #PROTEGE_FIELDS)
-        
-        if choice == nil then break end
-        
-        if choice == 1 then
-            backup_namespace_values()
-        elseif choice == 2 then
-            local selected_field = select_field_menu()
-            if selected_field then
-                field_multiplier_menu(selected_field)
-            end
-        elseif choice == 3 then
-            -- Quick multiplier untuk DisableDamageMotion
-            local field = MOB_FIELDS[1]  -- DisableDamageMotionAtSkillBreak
-            if original_values[field.name] then
-                apply_field_multiplier(field, 1)  -- Set ke true
-                gg.alert("✅ DisableDamageMotion diaktifkan!\nIni mungkin meningkatkan damage output")
-            end
-        elseif choice == 4 then
-            -- Quick multiplier untuk DamageEffectColor
-            local field = MOB_FIELDS[3]  -- DamageEffectColor_R
-            if original_values[field.name] then
-                apply_field_multiplier(field, 2.0)
-                gg.toast("✅ Damage effect color di-enhanced")
-            end
-        elseif choice == 5 then
-            show_field_info()
-        elseif choice == 6 then
-            revert_all_fields()
-        elseif choice == 7 then
-            break
-        end
-    end
-end
-
--- Inisialisasi
-gg.toast("🎮 Namespace-Based Damage Multiplier Loaded")
-gg.alert("⚠️  PERHATIAN:\n" ..
-    "Script ini mengacu pada struktur namespace yang benar:\n" ..
-    "• " .. MOB_NAMESPACE .. ": " .. #MOB_FIELDS .. " field\n" ..
-    "• " .. PROTEGE_NAMESPACE .. ": " .. #PROTEGE_FIELDS .. " field\n\n" ..
-    "Selalu backup terlebih dahulu!")
-
--- Jalankan main menu
-namespace_based_menu()
 
 -- Auto-revert on exit
 function onExit()
-    revert_all_fields()
-    gg.toast("🔄 Semua perubahan direvert otomatis")
+    if is_active then
+        gg.toast("🔄 Revert ke original...")
+        apply_damage_multiplier(1.0)
+    end
+    gg.toast("Script dihentikan")
 end
+
+-- Inisialisasi
+gg.toast("🎮 GetDamage Multiplier Loaded")
+gg.alert("⚠️  GETDAMAGE METHOD MULTIPLIER\n" ..
+    "Method: public int GetDamage(int index, CharacterBase target)\n" ..
+    "Offset: 0x" .. string.format("%X", GET_DAMAGE_OFFSET) .. "\n\n" ..
+    "Cara kerja:\n" ..
+    "• Memodifikasi ARM assembly method GetDamage\n" ..
+    "• Return value dikalikan dengan multiplier\n" ..
+    "• Lebih efektif karena langsung di source-nya")
+
+-- Dapatkan base address pertama
+base_address = get_base_address()
+
+-- Jalankan main menu
+main_menu()
 
 gg.registerExitHandler(onExit)
