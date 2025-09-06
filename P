@@ -1,236 +1,45 @@
--- ==========================================
--- GetDamage Method Multiplier Script
--- Berdasarkan offset: 0x2AF4AD4 (GetDamage method)
--- ==========================================
+if not gg then os.exit() end
+gg.setVisible(false)
+gg.alert("⚡ Basic Attack Speed & Bypass ⚡")
 
-gg.setRanges(gg.REGION_C_ALLOC | gg.REGION_CODE_APP)
-gg.clearResults()
+-- ambil base address libil2cpp.so
+local base = gg.getRangesList("libil2cpp.so")[1].start
 
--- Konfigurasi
-local LIB_NAME = "libil2cpp.so"
-local GET_DAMAGE_OFFSET = 0x2AF4AD4
+-- 1) Offset method GetDisableRunForNormalAttack (boolean)
+local offset_disable_run = 0x2AAF8AC
+local addr_disable_run = base + offset_disable_run
 
--- Variabel global
-local original_bytes = {}
-local base_address = 0
-local current_multiplier = 1.0
-local is_active = false
+-- patch ARM Thumb (return false → MOV R0, #0; BX LR = 00 20 70 47)
+local patch_disable_run = {
+  {address = addr_disable_run, flags = gg.TYPE_BYTE, value = "00 20 70 47"}
+}
+gg.setValues(patch_disable_run)
+gg.toast("✅ DisableRunForNormalAttack patched ke FALSE")
 
--- Fungsi mendapatkan base address
-function get_base_address()
-    local ranges = gg.getRangesList(LIB_NAME)
-    if #ranges == 0 then
-        gg.alert("❌ " .. LIB_NAME .. " tidak ditemukan!")
-        os.exit()
-    end
-    return ranges[1].start
+-- 2) Offset multiplier attack speed (contoh RVA, harus disesuaikan dump asli)
+local offset_attack_speed = 0x2AB1234
+local addr_attack_speed = base + offset_attack_speed
+
+-- input custom speed
+local input = gg.prompt(
+  {"Masukkan nilai kecepatan basic attack (default 10.0):"},
+  {10},
+  {"number"}
+)
+
+if input ~= nil then
+  local patch_speed = {
+    {address = addr_attack_speed, flags = gg.TYPE_FLOAT, value = input[1]}
+  }
+  gg.setValues(patch_speed)
+  gg.toast("⚡ Attack Speed di-set ke "..input[1])
+else
+  gg.toast("❌ User batal")
 end
 
--- Backup original bytes dari method GetDamage
-function backup_getdamage_method()
-    base_address = get_base_address()
-    local method_address = base_address + GET_DAMAGE_OFFSET
-    
-    -- Backup 12 bytes pertama dari method
-    original_bytes = gg.getValues({
-        {address = method_address, flags = gg.TYPE_DWORD},
-        {address = method_address + 4, flags = gg.TYPE_DWORD},
-        {address = method_address + 8, flags = gg.TYPE_DWORD}
-    })
-    
-    gg.toast("✅ Backup GetDamage method berhasil")
-    return true
+-- restore function
+function restore()
+  gg.setValues({{address = addr_disable_run, flags = gg.TYPE_BYTE, value = "?? ?? ?? ??"}}) -- isi original instruksi
+  gg.setValues({{address = addr_attack_speed, flags = gg.TYPE_FLOAT, value = 1.0}})
+  gg.toast("🔄 Dikembalikan ke normal")
 end
-
--- Apply damage multiplier dengan ARM assembly patching
-function apply_damage_multiplier(multiplier)
-    local method_address = base_address + GET_DAMAGE_OFFSET
-    
-    if multiplier == 1.0 then
-        -- Kembalikan ke original (revert)
-        gg.setValues(original_bytes)
-        gg.toast("✅ Damage multiplier dinonaktifkan")
-        is_active = false
-        current_multiplier = 1.0
-        return true
-    end
-
-    -- ARM assembly untuk return value * multiplier
-    local new_bytes = {}
-    
-    if multiplier == 2.0 then
-        -- x2: LSL R0, R0, #1 (Logical Shift Left untuk multiply 2)
-        new_bytes = {
-            {address = method_address, value = 0xE1A00080, flags = gg.TYPE_DWORD}, -- LSL R0, R0, #1
-            {address = method_address + 4, value = 0xE12FFF1E, flags = gg.TYPE_DWORD}, -- BX LR (return)
-            {address = method_address + 8, value = 0x00000000, flags = gg.TYPE_DWORD}  -- NOP
-        }
-    elseif multiplier == 5.0 then
-        -- x5: MOV R1, #5 -> MUL R0, R0, R1
-        new_bytes = {
-            {address = method_address, value = 0xE3A01005, flags = gg.TYPE_DWORD}, -- MOV R1, #5
-            {address = method_address + 4, value = 0xE0000190, flags = gg.TYPE_DWORD}, -- MUL R0, R0, R1
-            {address = method_address + 8, value = 0xE12FFF1E, flags = gg.TYPE_DWORD}  -- BX LR
-        }
-    elseif multiplier == 10.0 then
-        -- x10: MOV R1, #10 -> MUL R0, R0, R1
-        new_bytes = {
-            {address = method_address, value = 0xE3A0100A, flags = gg.TYPE_DWORD}, -- MOV R1, #10
-            {address = method_address + 4, value = 0xE0000190, flags = gg.TYPE_DWORD}, -- MUL R0, R0, R1
-            {address = method_address + 8, value = 0xE12FFF1E, flags = gg.TYPE_DWORD}  -- BX LR
-        }
-    else
-        -- Custom multiplier
-        local multiplier_int = math.floor(multiplier)
-        local opcode1 = 0xE3A01000 + multiplier_int -- MOV R1, #multiplier
-        local opcode2 = 0xE0000190 -- MUL R0, R0, R1
-        local opcode3 = 0xE12FFF1E -- BX LR
-        
-        new_bytes = {
-            {address = method_address, value = opcode1, flags = gg.TYPE_DWORD},
-            {address = method_address + 4, value = opcode2, flags = gg.TYPE_DWORD},
-            {address = method_address + 8, value = opcode3, flags = gg.TYPE_DWORD}
-        }
-    end
-
-    -- Apply patch
-    gg.setValues(new_bytes)
-    is_active = true
-    current_multiplier = multiplier
-    gg.toast("✅ Damage multiplier x" .. multiplier .. " diaktifkan")
-    return true
-end
-
--- Verifikasi method GetDamage
-function verify_getdamage_method()
-    local method_address = base_address + GET_DAMAGE_OFFSET
-    local current_bytes = gg.getValues({
-        {address = method_address, flags = gg.TYPE_DWORD},
-        {address = method_address + 4, flags = gg.TYPE_DWORD}
-    })
-    
-    -- Check jika method sudah di-patch
-    if current_bytes[1].value == original_bytes[1].value and 
-       current_bytes[2].value == original_bytes[2].value then
-        return true -- Masih original
-    else
-        return false -- Sudah di-modifikasi
-    end
-end
-
--- Menu utama
-function main_menu()
-    while true do
-        local menu_options = {
-            "🔹 Backup GetDamage Method",
-            "⚡ Multiplier x2 Damage",
-            "⚡ Multiplier x5 Damage", 
-            "⚡ Multiplier x10 Damage",
-            "🔧 Custom Multiplier",
-            "🔄 Reset ke Original",
-            "🔍 Status Method",
-            "❌ Keluar"
-        }
-        
-        local choice = gg.choice(menu_options, nil, "🎮 GETDAMAGE MULTIPLIER\n" ..
-            "Status: " .. (is_active and "AKTIF x" .. current_multiplier or "NON-AKTIF") ..
-            "\nOffset: 0x" .. string.format("%X", GET_DAMAGE_OFFSET))
-        
-        if choice == nil then break end
-        
-        if choice == 1 then
-            if backup_getdamage_method() then
-                gg.alert("✅ GetDamage method berhasil di-backup!\n" ..
-                         "Address: 0x" .. string.format("%X", base_address + GET_DAMAGE_OFFSET))
-            end
-        elseif choice == 2 then
-            if verify_getdamage_method() then
-                apply_damage_multiplier(2.0)
-            else
-                gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
-            end
-        elseif choice == 3 then
-            if verify_getdamage_method() then
-                apply_damage_multiplier(5.0)
-            else
-                gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
-            end
-        elseif choice == 4 then
-            if verify_getdamage_method() then
-                apply_damage_multiplier(10.0)
-            else
-                gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
-            end
-        elseif choice == 5 then
-            local custom = gg.prompt("Masukkan custom multiplier:", {10}, {"number"})
-            if custom and custom[1] and custom[1] > 0 then
-                if verify_getdamage_method() then
-                    apply_damage_multiplier(custom[1])
-                else
-                    gg.alert("❌ Method sudah dimodifikasi! Reset dulu.")
-                end
-            end
-        elseif choice == 6 then
-            apply_damage_multiplier(1.0) -- Reset ke original
-        elseif choice == 7 then
-            show_method_status()
-        elseif choice == 8 then
-            break
-        end
-        
-        gg.sleep(500)
-    end
-end
-
--- Tampilkan status method
-function show_method_status()
-    local method_address = base_address + GET_DAMAGE_OFFSET
-    local current_bytes = gg.getValues({
-        {address = method_address, flags = gg.TYPE_DWORD},
-        {address = method_address + 4, flags = gg.TYPE_DWORD},
-        {address = method_address + 8, flags = gg.TYPE_DWORD}
-    })
-    
-    local status_text = "📊 GETDAMAGE METHOD STATUS:\n\n"
-    status_text = status_text .. "📍 Address: 0x" .. string.format("%X", method_address) .. "\n"
-    status_text = status_text .. "📏 Offset: 0x" .. string.format("%X", GET_DAMAGE_OFFSET) .. "\n"
-    status_text = status_text .. "🔧 Status: " .. (is_active and "AKTIF" or "ORIGINAL") .. "\n"
-    
-    if is_active then
-        status_text = status_text .. "🎯 Multiplier: x" .. current_multiplier .. "\n"
-    end
-    
-    status_text = status_text .. "\n📝 Bytes saat ini:\n"
-    status_text = status_text .. "0x" .. string.format("%X", current_bytes[1].value) .. "\n"
-    status_text = status_text .. "0x" .. string.format("%X", current_bytes[2].value) .. "\n"
-    status_text = status_text .. "0x" .. string.format("%X", current_bytes[3].value)
-    
-    gg.alert(status_text)
-end
-
--- Auto-revert on exit
-function onExit()
-    if is_active then
-        gg.toast("🔄 Revert ke original...")
-        apply_damage_multiplier(1.0)
-    end
-    gg.toast("Script dihentikan")
-end
-
--- Inisialisasi
-gg.toast("🎮 GetDamage Multiplier Loaded")
-gg.alert("⚠️  GETDAMAGE METHOD MULTIPLIER\n" ..
-    "Method: public int GetDamage(int index, CharacterBase target)\n" ..
-    "Offset: 0x" .. string.format("%X", GET_DAMAGE_OFFSET) .. "\n\n" ..
-    "Cara kerja:\n" ..
-    "• Memodifikasi ARM assembly method GetDamage\n" ..
-    "• Return value dikalikan dengan multiplier\n" ..
-    "• Lebih efektif karena langsung di source-nya")
-
--- Dapatkan base address pertama
-base_address = get_base_address()
-
--- Jalankan main menu
-main_menu()
-
-gg.registerExitHandler(onExit)
