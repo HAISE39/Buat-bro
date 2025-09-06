@@ -1,6 +1,5 @@
 -- =====================================
 -- ⚡ Unlimited Skill / No Cooldown ⚡
--- By: Mas Joko + GG Script
 -- Support: ARM32 & ARM64
 -- =====================================
 
@@ -72,5 +71,5 @@ while true do
       os.exit()
     end
   end
-  gg.sleep(100)
+  gg.sleep(200) -- delay kecil biar ringan
 end
