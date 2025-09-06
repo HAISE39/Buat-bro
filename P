@@ -1,48 +1,45 @@
 if not gg then os.exit() end
 gg.setVisible(false)
+gg.alert("⚡ Unlimited Skill / No Cooldown ⚡")
+
 local base = gg.getRangesList("libil2cpp.so")[1].start
 
--- Offset AddListNormalAttackFrame (float)
-local offset_attack_frame = 0x2AA2354
-local addr_attack_frame = base + offset_attack_frame
+-- Offsets
+local offset_get_collision_time      = 0x2AA33A8
+local offset_get_collision_time_deep = 0x2AA357C
+local offset_add_collision_time      = 0x2AA2684
+local offset_clear_collision_time    = 0x2AA2404
 
--- Offset SetAnimatorWalkSpeed (int)
-local offset_anim_speed = 0x2AA234C
-local addr_anim_speed = base + offset_anim_speed
+-- Alamat
+local addr_get_collision_time      = base + offset_get_collision_time
+local addr_get_collision_time_deep = base + offset_get_collision_time_deep
+local addr_add_collision_time      = base + offset_add_collision_time
+local addr_clear_collision_time    = base + offset_clear_collision_time
 
--- Menu pilihan speed
-local menu = gg.choice({
-  "⚡ 10x Attack Speed",
-  "⚡ 20x Attack Speed",
-  "⚡ 30x Attack Speed",
-  "⚡ 50x Attack Speed",
-  "⚡ 100x Attack Speed",
-  "❌ Keluar"
-}, nil, "Pilih multiplier untuk Basic Attack:")
+-- Instruksi return cepat (ARM Thumb vs ARM64 beda)
+-- ARM32 Thumb: "70 47" (BX LR)
+-- ARM64: "C0 03 5F D6" (RET)
+local ret_thumb = "70 47"
+local ret_arm64 = "C0 03 5F D6"
 
-local speeds = {10.0, 20.0, 30.0, 50.0, 100.0}
+-- Patch: bikin semua function return cepat (anggap skill tidak punya cooldown)
+local patches = {
+  {address = addr_get_collision_time, flags = gg.TYPE_BYTE, value = ret_thumb},
+  {address = addr_get_collision_time_deep, flags = gg.TYPE_BYTE, value = ret_thumb},
+  {address = addr_add_collision_time, flags = gg.TYPE_BYTE, value = ret_thumb},
+  {address = addr_clear_collision_time, flags = gg.TYPE_BYTE, value = ret_thumb},
+}
+gg.setValues(patches)
 
-if menu ~= nil and menu ~= 6 then
-  local speedValue = speeds[menu]
+gg.toast("✅ Unlimited Skill aktif (Cooldown = 0)")
 
-  -- Patch frame value (float)
-  gg.setValues({
-    {address = addr_attack_frame, flags = gg.TYPE_FLOAT, value = speedValue}
-  })
-
-  -- Patch animator speed (int)
-  gg.setValues({
-    {address = addr_anim_speed, flags = gg.TYPE_DWORD, value = speedValue}
-  })
-
-  gg.toast("⚡ Attack Speed di-set ke "..speedValue.."x")
-else
-  gg.toast("❌ Batal")
-end
-
--- Restore function
+-- Restore
 function restore()
-  gg.setValues({{address = addr_attack_frame, flags = gg.TYPE_FLOAT, value = 1.0}})
-  gg.setValues({{address = addr_anim_speed, flags = gg.TYPE_DWORD, value = 1}})
+  gg.setValues({
+    {address = addr_get_collision_time, flags = gg.TYPE_BYTE, value = "?? ??"},
+    {address = addr_get_collision_time_deep, flags = gg.TYPE_BYTE, value = "?? ??"},
+    {address = addr_add_collision_time, flags = gg.TYPE_BYTE, value = "?? ??"},
+    {address = addr_clear_collision_time, flags = gg.TYPE_BYTE, value = "?? ??"},
+  })
   gg.toast("🔄 Dikembalikan ke normal")
 end
