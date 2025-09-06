@@ -1,33 +1,29 @@
+-- =====================================
+-- ⚡ Unlimited Skill / No Cooldown ⚡
+-- By: Mas Joko + GG Script
+-- =====================================
 
 if not gg then os.exit() end
 gg.setVisible(false)
 
--- Ambil base address libil2cpp
 local base = gg.getRangesList("libil2cpp.so")[1].start
 
--- Offset dari dump.cs
+-- Offset dari dump.cs (il2cpp)
 local offset_get_connect_cd = 0x2B6D7E0 -- GetConnectSkillCoolTime(int skillID)
 local offset_get_skill_cd   = 0x2BFEEA4 -- GetSkillCoolTime()
 local offset_is_accel_cd    = 0x2975584 -- IsAccelSkillCoolTime()
 local offset_get_cd_prop    = 0x2EE0914 -- get_skillCoolTime()
 
--- Hitung alamat absolut
+-- Hitung alamat asli
 local addr_connect_cd = base + offset_get_connect_cd
 local addr_skill_cd   = base + offset_get_skill_cd
 local addr_is_accel   = base + offset_is_accel_cd
 local addr_cd_prop    = base + offset_get_cd_prop
 
--- Patch bytes
-local patch_thumb = "70 47"       -- ARM32 Thumb (BX LR)
-local patch_arm64 = "C0 03 5F D6" -- ARM64 (RET)
+-- ARM32 Thumb patch → auto return 0/false
+local patch_bytes = "70 47"  -- BX LR (return cepat)
 
--- Deteksi arsitektur (kasar: range size > 0x100000000 biasanya ARM64)
-local isArm64 = gg.getTargetInfo().x64
-
--- Tentukan patch sesuai arsitektur
-local patch_bytes = isArm64 and patch_arm64 or patch_thumb
-
--- Patch data
+-- Data patch
 local patches = {
   {address = addr_connect_cd, flags = gg.TYPE_BYTE, value = patch_bytes},
   {address = addr_skill_cd,   flags = gg.TYPE_BYTE, value = patch_bytes},
@@ -35,24 +31,24 @@ local patches = {
   {address = addr_cd_prop,    flags = gg.TYPE_BYTE, value = patch_bytes},
 }
 
--- Simpan instruksi asli untuk restore
+-- Simpan instruksi asli untuk restore nanti
 local original = gg.getValues(patches)
 
 -- Fungsi aktifkan cheat
 function enableNoCooldown()
   gg.setValues(patches)
-  gg.toast("✅ Unlimited Skill / No Cooldown Aktif (" .. (isArm64 and "ARM64" or "ARM32") .. ")")
+  gg.toast("✅ Unlimited Skill / No Cooldown Aktif")
 end
 
--- Fungsi matikan cheat
+-- Fungsi restore cheat
 function disableNoCooldown()
   gg.setValues(original)
   gg.toast("🔄 Unlimited Skill / No Cooldown Dimatikan")
 end
 
--- Menu utama
+-- Menu toggle
 while true do
-  local menu = gg.choice({
+  menu = gg.choice({
     "⚡ Aktifkan Unlimited Skill",
     "❌ Matikan Unlimited Skill",
     "🚪 Keluar Script"
