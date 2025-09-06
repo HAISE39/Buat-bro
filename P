@@ -1,28 +1,26 @@
-gg.setVisible(false)
-modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
-\
-           ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
-\
-📆Dᴀᴛᴇ📆 : %Y/%m/%d\
-\
-🕛Tɪᴍᴇ🕛 : %H:%M:%S\
-\
-⏳Exᴘɪʀᴇᴅ Sᴄʀɪᴘᴛ⏳ : 0000/00/00\
-\
-           ❦ ════ •⊰❂ - ❂⊱• ════ ❦')
-gg.alert(modbyfami)
-gg.setVisible(true)
+-- =====================================
+-- ⚡ Unlimited Skill / No Cooldown ⚡
+-- Support: ARM32 & ARM64
+-- With Safety Checks
+-- =====================================
+
 if not gg then os.exit() end
 gg.setVisible(false)
 
--- Ambil base address libil2cpp
-local base = gg.getRangesList("libil2cpp.so")[1].start
+-- Cari libil2cpp.so
+local ranges = gg.getRangesList("libil2cpp.so")
+if #ranges == 0 then
+  gg.alert("❌ libil2cpp.so tidak ditemukan!\nGame mungkin tidak support / nama library berbeda.")
+  os.exit()
+end
+
+local base = ranges[1].start
 
 -- Offset dari dump.cs
-local offset_get_connect_cd = 0x2B6D7E0 -- GetConnectSkillCoolTime(int skillID)
-local offset_get_skill_cd   = 0x2BFEEA4 -- GetSkillCoolTime()
-local offset_is_accel_cd    = 0x2975584 -- IsAccelSkillCoolTime()
-local offset_get_cd_prop    = 0x2EE0914 -- get_skillCoolTime()
+local offset_get_connect_cd = 0x2B6D7E0
+local offset_get_skill_cd   = 0x2BFEEA4
+local offset_is_accel_cd    = 0x2975584
+local offset_get_cd_prop    = 0x2EE0914
 
 -- Hitung alamat absolut
 local addr_connect_cd = base + offset_get_connect_cd
@@ -46,8 +44,12 @@ local patches = {
   {address = addr_cd_prop,    flags = gg.TYPE_BYTE, value = patch_bytes},
 }
 
--- Simpan instruksi asli untuk restore
-local original = gg.getValues(patches)
+-- Simpan instruksi asli untuk restore (safety try)
+local status, original = pcall(function() return gg.getValues(patches) end)
+if not status then
+  gg.alert("❌ Gagal membaca offset! Versi game berbeda atau offset salah.")
+  os.exit()
+end
 
 -- Fungsi aktifkan cheat
 function enableNoCooldown()
@@ -80,5 +82,5 @@ while true do
       os.exit()
     end
   end
-  gg.sleep(200) -- delay kecil biar ringan
+  gg.sleep(200)
 end
