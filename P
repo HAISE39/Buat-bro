@@ -1,45 +1,71 @@
+
 if not gg then os.exit() end
 gg.setVisible(false)
-gg.alert("⚡ Unlimited Skill / No Cooldown ⚡")
 
+-- Ambil base address libil2cpp
 local base = gg.getRangesList("libil2cpp.so")[1].start
 
--- Offsets
-local offset_get_collision_time      = 0x2AA33A8
-local offset_get_collision_time_deep = 0x2AA357C
-local offset_add_collision_time      = 0x2AA2684
-local offset_clear_collision_time    = 0x2AA2404
+-- Offset dari dump.cs
+local offset_get_connect_cd = 0x2B6D7E0 -- GetConnectSkillCoolTime(int skillID)
+local offset_get_skill_cd   = 0x2BFEEA4 -- GetSkillCoolTime()
+local offset_is_accel_cd    = 0x2975584 -- IsAccelSkillCoolTime()
+local offset_get_cd_prop    = 0x2EE0914 -- get_skillCoolTime()
 
--- Alamat
-local addr_get_collision_time      = base + offset_get_collision_time
-local addr_get_collision_time_deep = base + offset_get_collision_time_deep
-local addr_add_collision_time      = base + offset_add_collision_time
-local addr_clear_collision_time    = base + offset_clear_collision_time
+-- Hitung alamat absolut
+local addr_connect_cd = base + offset_get_connect_cd
+local addr_skill_cd   = base + offset_get_skill_cd
+local addr_is_accel   = base + offset_is_accel_cd
+local addr_cd_prop    = base + offset_get_cd_prop
 
--- Instruksi return cepat (ARM Thumb vs ARM64 beda)
--- ARM32 Thumb: "70 47" (BX LR)
--- ARM64: "C0 03 5F D6" (RET)
-local ret_thumb = "70 47"
-local ret_arm64 = "C0 03 5F D6"
+-- Patch bytes
+local patch_thumb = "70 47"       -- ARM32 Thumb (BX LR)
+local patch_arm64 = "C0 03 5F D6" -- ARM64 (RET)
 
--- Patch: bikin semua function return cepat (anggap skill tidak punya cooldown)
+-- Deteksi arsitektur (kasar: range size > 0x100000000 biasanya ARM64)
+local isArm64 = gg.getTargetInfo().x64
+
+-- Tentukan patch sesuai arsitektur
+local patch_bytes = isArm64 and patch_arm64 or patch_thumb
+
+-- Patch data
 local patches = {
-  {address = addr_get_collision_time, flags = gg.TYPE_BYTE, value = ret_thumb},
-  {address = addr_get_collision_time_deep, flags = gg.TYPE_BYTE, value = ret_thumb},
-  {address = addr_add_collision_time, flags = gg.TYPE_BYTE, value = ret_thumb},
-  {address = addr_clear_collision_time, flags = gg.TYPE_BYTE, value = ret_thumb},
+  {address = addr_connect_cd, flags = gg.TYPE_BYTE, value = patch_bytes},
+  {address = addr_skill_cd,   flags = gg.TYPE_BYTE, value = patch_bytes},
+  {address = addr_is_accel,   flags = gg.TYPE_BYTE, value = patch_bytes},
+  {address = addr_cd_prop,    flags = gg.TYPE_BYTE, value = patch_bytes},
 }
-gg.setValues(patches)
 
-gg.toast("✅ Unlimited Skill aktif (Cooldown = 0)")
+-- Simpan instruksi asli untuk restore
+local original = gg.getValues(patches)
 
--- Restore
-function restore()
-  gg.setValues({
-    {address = addr_get_collision_time, flags = gg.TYPE_BYTE, value = "?? ??"},
-    {address = addr_get_collision_time_deep, flags = gg.TYPE_BYTE, value = "?? ??"},
-    {address = addr_add_collision_time, flags = gg.TYPE_BYTE, value = "?? ??"},
-    {address = addr_clear_collision_time, flags = gg.TYPE_BYTE, value = "?? ??"},
-  })
-  gg.toast("🔄 Dikembalikan ke normal")
+-- Fungsi aktifkan cheat
+function enableNoCooldown()
+  gg.setValues(patches)
+  gg.toast("✅ Unlimited Skill / No Cooldown Aktif (" .. (isArm64 and "ARM64" or "ARM32") .. ")")
+end
+
+-- Fungsi matikan cheat
+function disableNoCooldown()
+  gg.setValues(original)
+  gg.toast("🔄 Unlimited Skill / No Cooldown Dimatikan")
+end
+
+-- Menu utama
+while true do
+  local menu = gg.choice({
+    "⚡ Aktifkan Unlimited Skill",
+    "❌ Matikan Unlimited Skill",
+    "🚪 Keluar Script"
+  }, nil, "🔥 No Skill Cooldown Menu")
+
+  if menu == 1 then
+    enableNoCooldown()
+  elseif menu == 2 then
+    disableNoCooldown()
+  elseif menu == 3 then
+    gg.toast("👋 Keluar script")
+    os.exit()
+  else
+    gg.sleep(100)
+  end
 end
