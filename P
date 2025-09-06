@@ -1,8 +1,17 @@
--- =====================================
--- ⚡ Unlimited Skill / No Cooldown ⚡
--- Support: ARM32 & ARM64
--- =====================================
-
+gg.setVisible(false)
+modbyfami = os.date ('           ⚡MODMENU BY VELLIX⚡\
+\
+           ❦ ════ •⊰❂ - ❂⊱• ════ ❦\
+\
+📆Dᴀᴛᴇ📆 : %Y/%m/%d\
+\
+🕛Tɪᴍᴇ🕛 : %H:%M:%S\
+\
+⏳Exᴘɪʀᴇᴅ Sᴄʀɪᴘᴛ⏳ : 0000/00/00\
+\
+           ❦ ════ •⊰❂ - ❂⊱• ════ ❦')
+gg.alert(modbyfami)
+gg.setVisible(true)
 if not gg then os.exit() end
 gg.setVisible(false)
 
