@@ -1,0 +1,2140 @@
+import "android.app.*"
+import "android.os.*"
+import "android.widget.*"
+import "android.view.*"
+import "android.content.*"
+import "android.*"
+import "android.graphics.drawable.*"
+import "android.ext.*"
+import "android.graphics.drawable.GradientDrawable"
+import "android.graphics.*"
+import "android.graphics.drawable.ColorDrawable"
+import "android.content.Context"
+import "android.media.AudioManager"
+import "android.webkit.MimeTypeMap"
+
+marker_path = "/sdcard/Download/.ok"
+
+context = activity
+window = context.getSystemService("window")
+if Build.VERSION.SDK_INT >= 26 then
+    windowtype = 2038
+else
+    windowtype = 2003
+end
+
+function threadStart(runnable)
+    local newRun = luajava.createProxy("java.lang.Runnable", runnable)
+    local subThread = luajava.newInstance("java.lang.Thread", newRun)
+    subThread:start()
+    return subThread
+end
+
+function getShepeBackground(color, radiu)
+    drawable = luajava.new(GradientDrawable)
+    drawable.setShape(GradientDrawable.RECTANGLE)
+    drawable.setColor(color)
+    drawable.setCornerRadii({ radiu, radiu, radiu, radiu, radiu, radiu, radiu, radiu })
+    return drawable
+end
+
+function miaobian(d, r, t, y)
+    local InsideColor = Color.parseColor(t)
+    local drawable = GradientDrawable()
+    drawable.setShape(GradientDrawable.RECTANGLE)
+    drawable.setColor(InsideColor)
+    drawable.setCornerRadii({ r, r, r, r, r, r, r, r })
+    drawable.setStroke(d, Color.parseColor(y))
+    return drawable
+end
+
+function LoadUi()
+    local login = loadlayout({
+        LinearLayout,
+        layout_width = "fill",
+        layout_height = "fill",
+        gravity = "center",
+        {
+            CardView,
+            layout_width = "180dp",
+            layout_height = "290dp",
+            Elevation = '15dp',
+            radius = '15',
+            CardBackgroundColor = "#FFFFFFFF",
+            {
+                LinearLayout,
+                layout_width = -1,
+                layout_height = -1,
+                gravity = "center",
+                orientation = "vertical",
+                {
+                    CardView,
+                    layout_width = -1,
+                    layout_height = "140dp",
+                    layout_margin = "20dp",
+                    CardBackgroundColor = "#00FFFFFF",
+                    radius = '15',
+                    {
+                        ImageView,
+                        layout_width = -1,
+                        layout_height = -1,
+                        scaleType = "fitCenter",
+                        id = "pic",
+                    },
+                },
+                {
+                    EditText,
+                    layout_width = -1,
+                    layout_margin = "5dp",
+                    layout_height = "40dp",
+                    background = miaobian(3, 20, "#FFF9F9F9", "#FF000000"),
+                    textColor = 4278224127,
+                    padding = "5dp",
+                    inputType = "textPassword",
+                    hint = "Masukkan Password",
+                    id = "edit",
+                }, 
+                {
+                    TextView,
+                    layout_width = -1,
+                    layout_margin = "10dp",
+                    layout_height = -1,
+                    text = "Login",
+                    gravity = "center",
+                    textSize = "17sp",
+                    textColor = 0xFFFFFFFF,
+                    background = getShepeBackground(4278224127, 20),
+                    onClick = function()
+                        local input = edit.getText().toString()
+                        if input == "̧̡̡̨̧̻̦̭͕͉̮̤͓̤̣̮̣̰͕̤͓̲͚̝̭̣̺̣̰̞̦͕̖͇̗͈̞̲̙̘̖̞͉̖̠̲̹̠̹̺͈̟̲̝̜͚̖̙͕͕̞͈̗̝͙̩̹͜ͅ" then
+                            dlg_create.dismiss()
+                            file.mkdir("/sdcard/.txj")
+                            io.open(marker_path, "w"):write("ok"):close()
+                            print("Password Benar")
+                            luajava.exit()
+                        else
+                            print("Password Salah")
+                        end
+                    end,
+                },
+            },
+        },
+    })
+
+    threadStart({
+        run = function()
+            bit1 = loadbitmap("https://files.catbox.moe/p7yibm.png")
+            activity.runOnUiThread(luajava.createProxy("java.lang.Runnable", {
+                run = function()
+                    local create_dlg = AlertDialog.Builder(activity)
+                    create_dlg.setView(login)
+                    create_dlg.setCancelable(false)
+                    dlg_create = create_dlg.create()
+                    dlg_create.getWindow().setType(windowtype)
+                    dlg_create.getWindow().setBackgroundDrawable(ColorDrawable(0x00FFFFFF))
+                    dlg_create.show()
+                    pic.setImageBitmap(bit1)
+                end
+            }))
+        end
+    })
+end
+
+if io.open(marker_path) == nil then
+    Lock.Ui(LoadUi, nil, function(err)
+        print(err)
+        luajava.exit()
+    end)
+end
+
+dlg_create = nil
+
+
+-- fungsi utama, hanya muncul kalau dipanggil
+function showPasswordUI()
+  local login = loadlayout({
+    LinearLayout,
+    layout_width = "fill",
+    layout_height = "fill",
+    gravity = "center",
+    {
+      CardView,
+      layout_width = "220dp",
+      layout_height = "220dp",
+      radius = "15dp",
+      CardBackgroundColor = 0xFFFFFFFF,
+      {
+        LinearLayout,
+        orientation = "vertical",
+        padding = "15dp",
+        {
+          EditText,
+          layout_width = -1,
+          layout_height = "40dp",
+          id = "edit",
+          hint = "Masukkan Token VIP",
+          inputType = "textPassword",
+          textColor = 0xFF000000,
+          background = miaobian(2,15,"#22000000","#FFCCCCCC"),
+        },
+        {
+          LinearLayout,
+          layout_width = -1,
+          layout_height = "wrap_content",
+          orientation = "horizontal",
+          layout_marginTop = "20dp",
+          gravity = "center",
+          {
+            TextView,
+            layout_width = "0dp",
+            layout_height = "45dp",
+            layout_weight = "1",
+            gravity = "center",
+            text = "Batal",
+            textSize = "16sp",
+            textColor = 0xFFFFFFFF,
+            background = getShepeBackground(0xFFEF5350,20),
+            onClick = function()
+              if dlg_create then dlg_create.dismiss() end
+            end,
+          },
+          {
+            TextView,
+            layout_width = "0dp",
+            layout_height = "45dp",
+            layout_weight = "1",
+            gravity = "center",
+            text = "Input Token",
+            textSize = "16sp",
+            textColor = 0xFFFFFFFF,
+            background = getShepeBackground(0xFF2196F3,20),
+            layout_marginLeft = "10dp",
+            onClick = function()
+              local input = edit.getText().toString()
+              if input == "̢̡̧̢̢̡̨͕̟͖̩͇̭̠̫̙͍̻̥̬̲͎̗̩̮̟̻̣͙͖͎̫͚̳̳͚̩̲̯̰̱͍̥̺͚̖̣͙̩̻̰̣̬̬͍̼̗͔̪̺͕̳̤̘̤̭̻̗͖͈̼̗͎̯̥͎̲͙ͅͅK̶̡̧̡̡̨̢̧̢̛̛̛̛̛̛̛̼̱͉͈̣̰̘̖̗̦͙̘̭̥̰̦͍̱̮̲͈̥̟͇̥͍͈͎̺̫̖̬̤̲̫̖̤͍̱̣̟͈̦̺̯̗̀́̽́͊̀́̀̽̊̉̂̀̃́̆̊̽̄͆̒̄̉̏̔͊́̉̽͌̂̈́̋͛̅̾̍̆̓̈́̇̀̒̆̐̈̀̇̈̔̄́͑̔̽̑̐͌͒̌̄̾̊̈̃͒̄̋̓͑̄̑̍̍̓͐̐̀̈́̀̓͐̌̀̾̄̄́̆̊̀̍́̈́͑͌̔̐̓̂̃̅́̔̒͐̂͌̊͊̽̅͑̃͌̊͊͐̈̇̎̌̓́͒̏̾͐̈́̎̑͋͂̎̊͛̿̈́̊̎̾̅̄͌̍̀̓́͛̓̑͗̐͆͆͆̉̈̓̉̄̀͋̂̎̆͆̇́̑͌̇̑̀̏̓̐̽͂̈͊̐̎̔̈́͗͗̽̊́̈̿̍̂́̏̐̈̋̾͂͂̈̏͒̂̅͐̆͒̋̔̄̓́̈̂̀̒̌̐͋̔̐͒̽͒̋̉̒̑̋̅̅̿̌̋̍̍̿̍̒̀̉̽̎̄͊̈̍̒̂͘͘͘̚̕̚͘͘͘͘̕̕̕̕̚̚͘̕͜͠͝͠͝͝͝͝͠͠͝͝͠͝͠͝͝͝͝͝͝ͅͅͅ" then
+                print("Password Benar")
+                if dlg_create then dlg_create.dismiss() end
+              else
+                print("Password Salah")
+              end
+            end,
+          },
+        },
+      },
+    },
+  })
+
+  threadStart({
+    run=function()
+      activity.runOnUiThread(luajava.createProxy("java.lang.Runnable",{
+        run=function()
+          local create_dlg = AlertDialog.Builder(activity)
+          create_dlg.setView(login)
+          create_dlg.setCancelable(false)
+          dlg_create = create_dlg.create()
+          dlg_create.getWindow().setType(windowtype)
+          dlg_create.show()
+        end
+      }))
+    end
+  })
+end
+
+loadYunLuaGroup("5C3C4E3813681C4C204C35346F1B4C2F7EFF612D2B22176FF346535E1C0B1E493339036EE15318")
+function init()
+	stab = _ENV["halaman"]
+	ttitle = _ENV["judul"]
+	xfcpic = _ENV["ikon_jendela_mengambang"]
+end
+
+
+_ENV["ikon_jendela_mengambang"] = 'https://files.catbox.moe/mbkj32.png'
+-- Masukkan tautan langsung ke file gambar
+
+_ENV["judul"] = 'ELGG - UI'
+
+_ENV["halaman"] = {
+	-- Nama tab dan ikon di navbar. Tambahkan tabel untuk menambah halaman. Jumlah harus sesuai dengan jumlah halaman fungsi di bawah.
+	'PLAYER',
+	'FARM',
+	'VIP MENU',
+	'MUSIC',
+	'PENGATURAN',
+	--'Pengaturan',-- Contoh cara menambah halaman baru
+}
+
+init() -- Transfer variabel, jangan diubah
+
+function searchInDalvikMainSpace(searchString, searchType, sign)
+    gg.setRanges(gg.REGION_JAVA_HEAP)
+    local ranges = gg.getRangesList()
+    local matched = {}
+
+    for i, r in ipairs(ranges) do
+        if r.name and r.name:lower():find("dalvik%-main space") then
+            table.insert(matched, r)
+        elseif tostring(r):lower():find("dalvik%-main space") then
+            table.insert(matched, r)
+        end
+    end
+
+    if #matched == 0 then
+        gg.toast("❌ Tidak menemukan range dalvik-main space")
+        return false
+    end
+
+    local totalFound = 0
+    for i, r in ipairs(matched) do
+        local startAddr = tonumber(r.start) or tonumber(tostring(r.start), 16)
+        local endAddr   = tonumber(r["end"]) or tonumber(tostring(r["end"]), 16)
+
+        if startAddr and endAddr and startAddr < endAddr then
+            gg.searchNumber(searchString, searchType, false, sign, startAddr, endAddr, 0)
+            local count = gg.getResultCount()
+            if count > 0 then
+                totalFound = totalFound + count
+                gg.toast("✓ Range ke-" .. i .. ": " .. count .. " hasil")
+                return true
+            end
+        end
+    end
+    
+    if totalFound == 0 then
+        gg.toast("❌ Tidak ada hasil ditemukan")
+        return false
+    end
+end
+
+
+uistart({ -- Setiap halaman fungsi HARUS sesuai dengan nama halaman di atas. Jika kelebihan, tidak akan ditampilkan. Jika kurang, harus ditambah.
+	{ --1 Halaman Pengumuman
+		CAtext('MOD AURCUS ONLINE BY: VELLIXAO', '#005BFF', '14sp'),
+
+		CAbox({ 'BYPASS MENU',
+
+			CAbutton(
+			'Bypass Login',
+			function()
+				gg.setVisible(false)
+				gg.clearResults()
+				gg.processResume()
+				gg.searchNumber("1337;1;0;0::17", gg.TYPE_DWORD)
+				gg.refineNumber("1337")
+				local r = gg.getResults(10)
+				for i, v in ipairs(r) do
+					v.value = "0"
+					v.freeze = true
+				end
+				gg.addListItems(r)
+			end),
+
+			CAbutton(
+			'Optimizer Map',
+			function()
+				gg.setVisible(false)
+				function disableGGDetection()
+					gg.setRanges(gg.REGION_CODE_APP | gg.REGION_JAVA_HEAP)
+					gg.searchNumber("4761214;1162690580::17", gg.TYPE_DWORD) -- Nilai acak yang sering muncul dari libgg
+					gg.clearResults()
+					gg.toast("Bypass Deteksi GG Aktif")
+				end
+
+				function advancedMapStabilizer()
+
+					gg.clearResults()
+					gg.setRanges(gg.REGION_C_ALLOC)
+					gg.searchNumber("20000000~60000000", gg.TYPE_DWORD)
+					local res = gg.getResults(20)
+					for i, v in ipairs(res) do
+						v.value = "0"
+						v.freeze = true
+					end
+					gg.addListItems(res)
+					gg.toast("Advanced Stabilizer Aktif")
+				end
+
+				disableGGDetection()
+				advancedMapStabilizer()
+				gg.setVisible(false)
+				gg.clearResults()
+				gg.setRanges(gg.REGION_C_DATA)
+				gg.searchNumber("gg", gg.TYPE_BYTE)
+				gg.clearResults()
+				gg.clearList()
+			end),
+		}),
+
+		CAbox({ 'SAVE ITEM',
+			CAbutton(
+			'STORAGE',
+			function()
+				gg.clearResults()
+				gg.setVisible(false)
+				if searchInDalvikMainSpace("-1;2;-1:9", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+					gg.processResume()
+					gg.toast("BUKA ENCHANTMENT")
+					gg.sleep(5000)
+					gg.refineNumber("-1;59;-1:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+					gg.refineNumber("59", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+					rv = gg.getResults (1)
+					if #rv > 0 then
+						local v0_0 = {}
+						v0_0[1] = {}
+						v0_0[1].address = rv[1].address + 4
+						v0_0[1].flags = gg.TYPE_DWORD
+						v0_0[1].value = "12"
+						v0_0[1].freeze = false
+						gg.setValues(v0_0)
+					end
+				end
+			end),
+			CAbutton(
+			'MARKET',
+			function()
+				gg.clearResults()
+				gg.setVisible(false)
+				if searchInDalvikMainSpace("-1;2;-1:9", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+					gg.processResume()
+					gg.toast("BUKA ENCHANTMENT")
+					gg.sleep(5000)
+					gg.refineNumber("-1;59;-1:9", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+					gg.refineNumber("59", gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+					rTv = gg.getResults (1)
+					if #rTv > 0 then
+						local Tv0_0 = {}
+						Tv0_0[1] = {}
+						Tv0_0[1].address = rTv[1].address + 4
+						Tv0_0[1].flags = gg.TYPE_DWORD
+						Tv0_0[1].value = "27"
+						Tv0_0[1].freeze = false
+						gg.setValues(Tv0_0)
+					end
+				end
+			end),
+		}),
+		CAbox({ 'BASIC JOB DAMAGE',
+			CAbutton(
+			'SWORDMAN',
+			function()
+				gg.sleep(200)
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				local ranges = gg.getRangesList()
+				local matched = {}
+
+				for i, r in ipairs(ranges) do
+					if r.name and r.name:lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					elseif tostring(r):lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					end
+				end
+
+				if #matched > 0 then
+					for i, r in ipairs(matched) do
+						local startAddr = tonumber(r.start) or tonumber(tostring(r.start), 16)
+						local endAddr   = tonumber(r["end"]) or tonumber(tostring(r["end"]), 16)
+
+						if startAddr and endAddr and startAddr < endAddr then
+							gg.searchNumber("h 03 00 00 00 1E 00 00 00 01 00 00 00 02 00 00 00", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, startAddr, endAddr, 0)
+							local count = gg.getResultCount()
+							if count > 0 then
+								gg.processResume()
+								gg.skipRestoreState()
+								if gg.isVisible(true) then
+									gg.setVisible(false)
+									gg.alert(" 💢ʙʏᴘᴀss ᴀɴᴛɪ ᴠɪᴇᴡ : ᴀᴄᴛɪᴠᴇ💢")
+									gg.clearResults()
+									gg.processKill()
+									os.exit()
+								end
+								gg.refineNumber("30", gg.TYPE_BYTE, false, gg.SIGN_EQUAL)
+								gg.processResume()
+								r = gg.getResults (1)
+								if #r > 0 then
+									local L0_0 = {}
+									L0_0[1] = {}
+									L0_0[1].address = r[1].address + 24
+									L0_0[1].flags = gg.TYPE_DWORD
+									L0_0[1].value = "h 7F 96 98 00"
+									L0_0[1].freeze = false
+									L0_0[2] = {}
+									L0_0[2].address = r[1].address + 28
+									L0_0[2].flags = gg.TYPE_DWORD
+									L0_0[2].value = "h 7F 96 98 00"
+									L0_0[2].freeze = false
+									gg.setValues(L0_0)
+									gg.addListItems(L0_0)
+								end
+								break
+							end
+						end
+					end
+				end
+				gg.clearResults()
+				gg.clearList()
+			end),
+			CAbutton(
+			'ARCHER',
+			function()
+				gg.sleep(200)
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				local ranges = gg.getRangesList()
+				local matched = {}
+
+				for i, r in ipairs(ranges) do
+					if r.name and r.name:lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					elseif tostring(r):lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					end
+				end
+
+				if #matched > 0 then
+					for i, r in ipairs(matched) do
+						local startAddr = tonumber(r.start) or tonumber(tostring(r.start), 16)
+						local endAddr   = tonumber(r["end"]) or tonumber(tostring(r["end"]), 16)
+
+						if startAddr and endAddr and startAddr < endAddr then
+							gg.searchNumber("h 07 00 00 00 22 00 00 00 01 00 00 00 04 00 00 00", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, startAddr, endAddr, 0)
+							local count = gg.getResultCount()
+							if count > 0 then
+								gg.processResume()
+								if gg.isVisible(true) then
+									gg.setVisible(false)
+									gg.alert(" 💢ʙʏᴘᴀss ᴀɴᴛɪ ᴠɪᴇᴡ : ᴀᴄᴛɪᴠᴇ💢")
+									gg.clearResults()
+									gg.processKill()
+									os.exit()
+								end
+								gg.refineNumber("34", gg.TYPE_BYTE, false, gg.SIGN_EQUAL)
+								gg.processResume()
+								r1 = gg.getResults (1)
+								if #r1 > 0 then
+									local L1_0 = {}
+									L1_0[1] = {}
+									L1_0[1].address = r1[1].address + 24
+									L1_0[1].flags = gg.TYPE_DWORD
+									L1_0[1].value = "h 7F 96 98 00"
+									L1_0[1].freeze = false
+									L1_0[2] = {}
+									L1_0[2].address = r1[1].address + 28
+									L1_0[2].flags = gg.TYPE_DWORD
+									L1_0[2].value = "h 7F 96 98 00"
+									L1_0[2].freeze = false
+									gg.setValues(L1_0)
+									gg.addListItems(L1_0)
+								end
+								break
+							end
+						end
+					end
+				end
+				gg.clearResults()
+				gg.clearList()
+			end),
+			CAbutton(
+			'MAGE',
+			function()
+				gg.sleep(200)
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				local ranges = gg.getRangesList()
+				local matched = {}
+
+				for i, r in ipairs(ranges) do
+					if r.name and r.name:lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					elseif tostring(r):lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					end
+				end
+
+				if #matched > 0 then
+					for i, r in ipairs(matched) do
+						local startAddr = tonumber(r.start) or tonumber(tostring(r.start), 16)
+						local endAddr   = tonumber(r["end"]) or tonumber(tostring(r["end"]), 16)
+
+						if startAddr and endAddr and startAddr < endAddr then
+							gg.searchNumber("h05000000200000000100000003000000", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, startAddr, endAddr, 0)
+							local count = gg.getResultCount()
+							if count > 0 then
+								gg.processResume()
+								if gg.isVisible(true) then
+									gg.setVisible(false)
+									gg.alert(" 💢ʙʏᴘᴀss ᴀɴᴛɪ ᴠɪᴇᴡ : ᴀᴄᴛɪᴠᴇ💢")
+									gg.clearResults()
+									gg.processKill()
+									os.exit()
+								end
+								gg.refineNumber("32", gg.TYPE_BYTE, false, gg.SIGN_EQUAL)
+								gg.processResume()
+								r2 = gg.getResults (1)
+								if #r2 > 0 then
+									local L2_0 = {}
+									L2_0[1] = {}
+									L2_0[1].address = r2[1].address + 24
+									L2_0[1].flags = gg.TYPE_DWORD
+									L2_0[1].value = "h 7F 96 98 00"
+									L2_0[1].freeze = false
+									L2_0[2] = {}
+									L2_0[2].address = r2[1].address + 28
+									L2_0[2].flags = gg.TYPE_DWORD
+									L2_0[2].value = "h 7F 96 98 00"
+									L2_0[2].freeze = false
+									gg.setValues(L2_0)
+									gg.addListItems(L2_0)
+								end
+								break
+							end
+						end
+					end
+				end
+				gg.clearResults()
+				gg.clearList()
+			end
+			),
+			CAbutton(
+			'TANK/SUPPORT',
+			function()
+				gg.sleep(200)
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				local ranges = gg.getRangesList()
+				local matched = {}
+
+				for i, r in ipairs(ranges) do
+					if r.name and r.name:lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					elseif tostring(r):lower():find("dalvik%-main space") then
+						table.insert(matched, r)
+					end
+				end
+
+				if #matched > 0 then
+					for i, r in ipairs(matched) do
+						local startAddr = tonumber(r.start) or tonumber(tostring(r.start), 16)
+						local endAddr   = tonumber(r["end"]) or tonumber(tostring(r["end"]), 16)
+
+						if startAddr and endAddr and startAddr < endAddr then
+							gg.searchNumber("h 01 00 00 00 1C 00 00 00 01 00 00 00 01 00 00 00", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, startAddr, endAddr, 0)
+							local count = gg.getResultCount()
+							if count > 0 then
+								gg.processResume()
+								if gg.isVisible(true) then
+									gg.setVisible(false)
+									gg.alert(" 💢ʙʏᴘᴀss ᴀɴᴛɪ ᴠɪᴇᴡ : ᴀᴄᴛɪᴠᴇ💢")
+									gg.clearResults()
+									os.exit()
+								end
+								gg.refineNumber("28", gg.TYPE_BYTE, false, gg.SIGN_EQUAL)
+								gg.processResume()
+								r3 = gg.getResults (1)
+								if #r3 > 0 then
+									local L3_0 = {}
+									L3_0[1] = {}
+									L3_0[1].address = r3[1].address + 24
+									L3_0[1].flags = gg.TYPE_DWORD
+									L3_0[1].value = "h 7F 96 98 00"
+									L3_0[1].freeze = false
+									L3_0[2] = {}
+									L3_0[2].address = r3[1].address + 28
+									L3_0[2].flags = gg.TYPE_DWORD
+									L3_0[2].value = "h 7F 96 98 00"
+									L3_0[2].freeze = false
+									gg.setValues(L3_0)
+									gg.addListItems(L3_0)
+								end
+								break
+							end
+						end
+					end
+				end
+				gg.clearResults()
+				gg.clearList()
+			end
+			),
+		}),
+		CAtext('OTHER'),
+		CAcheck({
+			{
+				"STATUS PLAYER",
+				function()
+					gg.clearResults()
+					gg.setVisible(false)
+					d=gg.prompt({
+						"Masukan Jumlah Move"}, {0}, {"number"})
+					if d == nil then return end
+					
+					local searchPattern = "211;" .. d[1] .. ";200"
+					if searchInDalvikMainSpace(searchPattern, gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+						gg.getResults (10)
+						gg.refineAddress("D8", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL, 0, -1, 0)
+						gg.refineNumber(d[1], gg.TYPE_DWORD, false, gg.SIGN_EQUAL, 0, -1, 0)
+						r = gg.getResults (1)
+						
+						if #r > 0 then
+							L={'', '', '', '', '', ''}
+							LD = 0
+							for i=0, 6, 1 do
+								if gg.isVisible(true) and i ~= 6 then
+									gg.setVisible(false)
+								end
+								gg.sleep(1000)
+								gg.toast('Loading: '..L[1]..L[2]..L[3]..L[4]..L[5]..L[6]..' '..LD..'/120%')
+								LD = LD + 20
+								table.remove(L)
+								table.insert(L, 2, "")
+								if i == 6 then
+									gg.sleep(2000)
+								end
+							end
+							local L0_0 = {}
+							L0_0[1] = {}
+							L0_0[1].address = r[1].address + -72 -- hight damage
+							L0_0[1].flags = gg.TYPE_DWORD
+							L0_0[1].value = "999999999"
+							L0_0[1].freeze = true
+							L0_0[2] = {}
+							L0_0[2].address = r[1].address + 300 -- unlimited mana
+							L0_0[2].flags = gg.TYPE_DWORD
+							L0_0[2].value = "-999"
+							L0_0[2].freeze = true
+							L0_0[3] = {}
+							L0_0[3].address = r[1].address + 304 -- unlimited skill
+							L0_0[3].flags = gg.TYPE_DWORD
+							L0_0[3].value = "-999"
+							L0_0[3].freeze = true
+							gg.setValues(L0_0)
+							gg.addListItems(L0_0)
+							local ox = {}
+							ox= gg.prompt({
+								"Select: [5;10000]"}, {0}, {"number"})
+							if ox then
+								gg.editAll(ox[1], 4)
+								revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+								local t = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+								for i, v in ipairs(t) do
+									if v.flags == gg.TYPE_DWORD then
+										v.value = ox [1]
+										v.freeze = true
+									end
+								end
+								gg.addListItems(t)
+								t = nil
+							end
+						end
+					end
+				end,
+				function()
+					-- Off function
+				end
+			}, {
+				"DUNGEON CODE",
+				function()
+					gg.alert('DESKRIPSI SCRIPT DUGEON\nPergi ke elmo di galleria capital dan pilih mision Minotaur\npilih mode normal dan cari angka 1 lalu pilih mode hard dan murni kan menjadi 10  jika selesai di edit kalian langsung masuk salon (tanpa frezz)NPC\n\nblacksmith search 1 pergi unhappy man murnikan78\n29 g1 shop\n50 sai 4*\n51 La release\n52 festival fan\n53 latent abi\n55 AoT =1044\n58 hello kity\n60-64,83 legit furnis\n65 e.shadow\n66 chocolate furni\n68 fish expan\n70 Cursed weap\n71 Dispel 5\n72 Obsidian=1327 \n73 haloween furni n ava\n74 snowman\n76 choco furnis\n84 schoolgirl furni\n87 starry sky wall furni\n97 mw3 ava\n98 halloween\n99 str main int sub neck hp\n100 dex head cri body hp leg 1171 bot best pick\n101 cridmg sub men 1387\n102 dex main,def,mpr 1407\n103 hp body, gold furnis 1487\n104 roar mdef int ear 1492\n105 cri head ,matk ring 1497\n106 str sub,vit lower, def ring 1578\n107 snowman\n108 snowalls,veteran abi=1586\n109sweet furnis\n110 demist\n111 blue jp furni\n\nDungeons\n\n480ancient tower\n570 ebisu kagura\n890 alert area\n930 headway fort mime\n960 hidden cradle\n1050 library of insanity\n1109 haya\n1287 95 regilis\n1236 large ring tower\n1299 mitera\n752 tasogarep\n430 northern cape\n1360 matia cosmos\n1410 awekening quest dungeon\n1546 trex\n1606 nk hard 1625 nk expert\n\nGATES\n\n1316 g4\n1320 g5\n1420 g6\n1562 g7\n1650 g8\n\nJP DUNGEONS\n\n750 silver world\n860 nightmare world\n1044 titan expert 4*\n1136 yelow cloth piece\n1142 secret hideout\n1159 relier hard\n1171 relier maze hyumo,tiger rock\n1256 hulk n schoolgirl\n1258 seagod book/green crystal\n1265 EXP TAURUS\n1268 holy worl,holy abi\n1270 dark world\n1274 foxgirl,jp leafs\n1327 Dark Obsidian\n1331 orange pumpkin\n1328 pumpkin blu\n1330 pumpkin green\n1331 pumpkin orange\n1376 blue/red crystal\n1387 Dragon fosil\n1397 souqs mucus\n1407 Onyx\n1411 discipline world, exp mission\n1428 school girl / hearts\n1487 taurus\n1492 maze of famine\n1493 fox,silver coin of hapiness\n1497 tailwind,crystal of storm\n1502 schoolgirl\n1567 nightmare\n1573 pumpkin\n1574 large e.shadow leaf\n1578 79 latent\n1586 proof of victory')
+				end,
+				function()
+					-- Off function
+				end
+			}, {
+				"Prea Skill(Bola Heal)",
+				function()
+					-- On function
+				end,
+				function()
+					-- Off function
+				end
+			}, {
+				"Ambil Watergun",
+				function()
+					gg.clearResults()
+					gg.setVisible(false)
+					if searchInDalvikMainSpace("964;2;1:9", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("964", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1185", gg.TYPE_DWORD)
+					end
+					gg.clearResults()
+					gg.processResume()
+				end,
+				function()
+					-- Off function
+				end
+			},
+		}),
+
+		CAtext('Other Bonus Fiture'),
+
+		CAswitch(
+		"WaterBoom",
+		function()
+			gg.setVisible(false)
+			gg.processResume()
+			if searchInDalvikMainSpace("1F;11524;16:97", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.refineAddress("C", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL)
+				gg.refineNumber("11524", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("11001", gg.TYPE_DWORD)
+			end
+			gg.processResume()
+			gg.clearResults()
+			
+			if searchInDalvikMainSpace("1F;11522;16:97", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.refineAddress("C", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL)
+				gg.refineNumber("11522", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("10308", gg.TYPE_DWORD)
+			end
+			gg.processResume()
+			gg.clearResults()
+		end,
+		function()
+			gg.setVisible(false)
+			gg.processResume()
+			if searchInDalvikMainSpace("1F;11001;16:97", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.refineAddress("C", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL)
+				gg.refineNumber("11001", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("11524", gg.TYPE_DWORD)
+			end
+			gg.processResume()
+			gg.clearResults()
+			
+			if searchInDalvikMainSpace("1F;10308:97", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.refineAddress("C", -1, gg.TYPE_DWORD, gg.SIGN_EQUAL)
+				gg.refineNumber("10308", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("11522", gg.TYPE_DWORD)
+			end
+			gg.processResume()
+			gg.clearResults()
+		end,
+		'Wajib Menggunakan Ke Dua WaterShoot Terlebih Dahulu'),
+
+		CAswitch(
+		"Auto Buff",
+		function()
+			gg.setVisible(false)
+
+local farmingEffectCodes = {178, 178, 134, 134, 200, 200, 432, 432, 110, 110, 111, 111, 117, 117, 253, 253, 254, 254, 369, 369, 165, 165, 442, 442, 52, 52, 51, 51}
+local xpEffectCodes = {133, 133, 157, 157, 200, 200, 222, 222, 432, 432, 192, 192, 199, 199, 197, 197, 164, 164, 216, 216, 217, 217, 555, 555, 553, 553, 545, 545, 49, 49, 50, 50, 57, 57, 202, 202} -- <-- Nanti kamu isi sendiri
+
+-- Fungsi: Simpan hasil pencarian trigger
+function cariTrigger()
+  gg.setVisible(false)
+  gg.clearResults()
+  gg.setRanges(gg.REGION_JAVA_HEAP)
+  if searchInDalvikMainSpace("1D;-1D;1008981770D;1.0F;65793D:61", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+  gg.refineNumber("1", gg.TYPE_DWORD)
+  gg.refineAddress("0", -1, gg.TYPE_DWORD)
+  end
+  local results = gg.getResults(1000)
+  if #results == 0 then gg.alert("❌ Tidak ada hasil Trigger.") os.exit() end
+  local offsetList = {}
+  for _, v in ipairs(results) do
+    table.insert(offsetList, {
+      address = v.address + 0x60,
+      flags = gg.TYPE_DWORD,
+      value = 0,
+      freeze = false,
+      name = "trigger"
+    })
+  end
+  gg.addListItems(offsetList)
+end
+
+-- Fungsi: Simpan hasil pencarian buff
+function cariBuff()
+  gg.setVisible(false)
+  gg.clearResults()
+  gg.setRanges(gg.REGION_JAVA_HEAP)
+  if searchInDalvikMainSpace("65536;210;1:17", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then 
+  gg.sleep(500)
+  gg.refineNumber("210", gg.TYPE_DWORD)
+  end
+  local results = gg.getResults(1)
+  if #results == 0 then gg.alert("❌ Tidak ditemukan nilai 210.") os.exit() end
+  results[1].name = "buff"
+  results[1].freeze = false
+  gg.addListItems(results)
+end
+
+-- Fungsi: Jalankan efek buff otomatis
+function applyBuff(effectCodes)
+  -- Ambil buff dari save list
+  local buffList = gg.getListItems()
+  local buffAddr = nil
+  for _, v in ipairs(buffList) do
+    if v.name == "buff" then
+      buffAddr = v.address
+      break
+    end
+  end
+  if not buffAddr then gg.alert("❌ Buff tidak ditemukan.") os.exit() end
+
+  -- Offset +4 freeze ke 1
+  local offsetPlus4 = buffAddr + 4
+  gg.setValues({{address = offsetPlus4, flags = gg.TYPE_DWORD, value = 1}})
+  gg.addListItems({{
+    address = offsetPlus4,
+    flags = gg.TYPE_DWORD,
+    value = 1,
+    freeze = true,
+    name = "freeze_1"
+  }})
+
+  -- Freeze nilai utama jadi 61
+  gg.setValues({{address = buffAddr, flags = gg.TYPE_DWORD, value = 61}})
+  gg.addListItems({{
+    address = buffAddr,
+    flags = gg.TYPE_DWORD,
+    value = 61,
+    freeze = true,
+    name = "buff_main"
+  }})
+
+  gg.sleep(1000)
+
+  -- Loop edit semua efek buff
+  for _, val in ipairs(effectCodes) do
+    gg.editAll(tostring(val), gg.TYPE_DWORD)
+    local hasil = gg.getResults(100)
+    for _, v in ipairs(hasil) do
+      v.value = val
+      v.freeze = true
+    end
+    gg.addListItems(hasil)
+    gg.toast("✔ Efek " .. val .. " diterapkan.")
+    gg.sleep(1000)
+  end
+end
+
+-- Fungsi: Bekukan trigger
+function aktifkanTrigger()
+  local triggerList = gg.getListItems()
+  for _, v in ipairs(triggerList) do
+    if v.name == "trigger" then
+      v.value = 9876258
+      v.freeze = true
+    end
+  end
+  gg.setValues(triggerList)
+  gg.addListItems(triggerList)
+end
+
+-- Fungsi: Hapus semua freeze kecuali nilai 1
+function bersihkanFreeze()
+  local list = gg.getListItems()
+  local baru = {}
+  for _, v in ipairs(list) do
+    if v.value == 1 and v.flags == gg.TYPE_DWORD then
+      table.insert(baru, v) -- Pertahankan
+    end
+  end
+  gg.clearList()
+  gg.addListItems(baru)
+end
+
+-- ========== JALANKAN OTOMATIS ==========
+
+-- Langkah awal
+cariTrigger()
+cariBuff()
+
+-- Menu pilihan
+local pilih = gg.choice({
+  "📦 Farming Only",
+  "📘 XP Only",
+  "❌ Keluar"
+}, nil, "Auto Buff Menu")
+if pilih == 1 then
+  aktifkanTrigger()
+  applyBuff(farmingEffectCodes)
+  bersihkanFreeze()
+elseif pilih == 2 then
+  aktifkanTrigger()
+  applyBuff(xpEffectCodes)
+  bersihkanFreeze()
+else
+  gg.toast("🚪 Keluar dari script.")
+  os.exit()
+end
+
+while true do
+  if gg.isVisible(true) then
+    gg.setVisible(false)
+    pilih()
+  end
+end
+		end,
+		function()
+
+		end,
+		'Only Evade Sino'),
+
+		CAswitch(
+		"Refresh Skill",
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("3;81;20:9", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("3", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("25", gg.TYPE_DWORD)
+			else
+				gg.toast("❌ Tidak menemukan pattern Refresh Skill di dalvik-main space")
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end,
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("25;81;20:9", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("25", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("3", gg.TYPE_DWORD)
+			else
+				gg.toast("❌ Tidak menemukan pattern untuk revert di dalvik-main space")
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end,
+		'Menu Status'),
+
+
+
+	}, {
+		CAswitch(
+		"Night Knight",
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("246;1008981770;1800;1175::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("161;1008981770;1556;1176::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("96;1008981770;3085;1174::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("1081;1008981770;1285;1164::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("95;1008981770;3081;1177::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("257;1008981770;2569;1074::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("124;1008981770;2566;1178::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end,
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("246;-1;1800;1175::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("161;-1;1556;1176::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("96;-1;3085;1174::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("1081;-1;1285;1164::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("95;-1;3081;1177::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("257;-1;2569;1074::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("124;-1;2566;1178::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end
+		),
+		CAswitch(
+		"Setta Area",
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("15;1;1065353216;1008981770;1058642330;1072064102;5379:33", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("168;1;1008981770;1056964608;1072064102;1311:33", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("12;1;1072064102;1056964608;1008981770;1072064102;3614:33", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end,
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("15;1;1065353216;-1;1058642330;1072064102;5379:33", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("168;1;-1;1056964608;1072064102;1311:33", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("12;1;1072064102;1056964608;-1;1072064102;3614:33", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end
+		),
+		CAswitch(
+		"Eveome Area",
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("95;1008981770::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("88;1008981770::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("172;1008981770::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("256;1008981770::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("257;1008981770::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("88;1008981770::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-1", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end,
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("95;-1::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("88;-1::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("172;-1::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("256;-1::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("257;-1::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+
+			if searchInDalvikMainSpace("88;-1::50", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("1008981770", gg.TYPE_DWORD)
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end),
+		CAbutton(
+		'Loop Skill',
+		function()
+			gg.clearResults()
+			gg.setVisible(false)
+			if searchInDalvikMainSpace("119;0;16777216:13", gg.TYPE_DWORD, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("119", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				local t = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				for i, v in ipairs(t) do
+					if v.flags == gg.TYPE_DWORD then
+						v.value = "40"
+						v.freeze = true
+					end
+				end
+				gg.addListItems(t)
+				t = nil
+			else
+				gg.toast("❌ Tidak menemukan pattern Loop Skill di dalvik-main space")
+			end
+
+			gg.clearResults()
+			gg.processResume()
+		end),
+		CAbox({ 'Guild Mission',
+			CAbutton(
+			'DEN OF NO RETURN',
+			function ()
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				if searchInDalvikMainSpace("159;1;1077936128;1008981770;33554689;1054:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(4, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+				gg.clearResults()
+				end
+			end),
+			CAbutton(
+			'FORES MANA POLL',
+			function ()
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				if searchInDalvikMainSpace("129;1;1077936128;1008981770;50331905;1550:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+end
+				gg.clearResults()
+				if searchInDalvikMainSpace("129;1;1077936128;1008981770;16777473;1550:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+end
+				gg.clearResults()
+				if searchInDalvikMainSpace("129;1;1082549862;1008981770;33554689;1550:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+end
+				gg.clearResults()
+			end),
+			CAbutton(
+			'PREA PDIP',
+			function ()
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				if searchInDalvikMainSpace("717;1;1080033280;1008981770;1061997773;1069547520;1073741824;33620225:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+				end
+				gg.clearResults()
+			end ),
+			CAbutton(
+			'OGRE',
+			function ()
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				if searchInDalvikMainSpace("657;1;1075838976;1008981770;16777473;2565:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.processResume()
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(1, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+				end
+				gg.clearResults()
+			end ),
+			CAbutton(
+			'AVES',
+			function ()
+				gg.clearResults()
+				gg.setVisible(false)
+				gg.setRanges(gg.REGION_JAVA_HEAP)
+				if searchInDalvikMainSpace("258;1;2.0F;1008981770;1.5F;67109121;1806:33", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+				gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+				revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+				gg.editAll("-2", gg.TYPE_DWORD)
+end
+				gg.clearResults()
+				gg.processResume()
+			end), }),
+
+		CAbox({ 'GATE AREA',
+			CAcheck({
+				{
+					"Gate 1",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("212;1;1069547520;1008981770;50331905:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("212;1;1069547520;-1;50331905:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end
+				}, {
+					"Gate 2",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("586;1;1065353216;1008981770;1080033280;16777473:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						if searchInDalvikMainSpace("586;1;1066192077;-1;1082130432;33554689:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL)
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+						gg.toast('Area Gate 2 : Actived✔️')
+					end,
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("586;1;1065353216;-1;1080033280;16777473:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						if searchInDalvikMainSpace("586;1;1066192077;-1;1082130432;33554689:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+						gg.toast('Area Gate 2 : Actived✔️')
+					end
+				}, {
+					"Gate 3",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("699;1;1065353216;1008981770;1069547520;1082549862;1082549862;16777473:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+					function()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("699;1;1065353216;-1;1069547520;1082549862;1082549862;16777473:29", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end
+				},{
+					"Gate 4",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("836;1008981770;1280;937:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("836;-1;1280;937:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+				},{
+					"Gate 5",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("662D;1008981770;10280;949;662;1008981770;10280;950:125", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+						end
+						gg.clearResults()
+						gg.processResume()
+					end,
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("662D;-1;10280;949;662;-1;10280;950:125", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end
+				},{
+					"Gate 6",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("257D;1008981770;2569D;1074D::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("257D;-1;2569D;1074D::50", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end
+				},{
+					"Gate 7",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("1061;1008981770;2565;1154:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("1061;-1;2565;1154:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end
+				},{
+					"Gate 8",
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("865D;1008981770D;1554D;1181D:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("1008981770", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("-1", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end,
+					function()
+						gg.clearResults()
+						gg.setVisible(false)
+						gg.setRanges(gg.REGION_JAVA_HEAP)
+						if searchInDalvikMainSpace("865D;-1D;1554D;1181D:45", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) then
+						gg.processResume()
+						gg.refineNumber("-1", gg.TYPE_DWORD, false, gg.SIGN_EQUAL) 
+						revert = gg.getResults(100, nil, nil, nil, nil, nil, nil, nil, nil)
+						gg.editAll("1008981770", gg.TYPE_DWORD)
+end
+						gg.clearResults()
+						gg.processResume()
+					end
+				},
+
+			}),
+		}),
+	}, { --3 Halaman Kustomisasi
+	
+CAbox({ 'TRADE GATE ITEM',
+
+			CAbutton(
+			'TRADE SKIN',
+			function()
+			showPasswordUI()
+			end),
+			
+			CAbutton(
+			'ACCESORIES',
+			function()
+		showPasswordUI()
+			end),
+
+			CAbutton(
+			'TRADE WEAPON',
+			function()
+		showPasswordUI()
+			end),
+		}),
+
+CAbox({ 'SKIP DUNGEON',
+
+			CAbutton(
+			'NIGHT KNIGHT',
+			function()
+		showPasswordUI()
+			end),
+			
+			CAbutton(
+			'GATE 1',
+			function()
+		showPasswordUI()
+			end),
+
+			CAbutton(
+			'GATE 2',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'GATE 3',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'GATE 4',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'GATE 5',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'GATE 6',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'GATE 7',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'GATE 8',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'DEN OF NO RETURN',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'FORES MANA POLL',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'PREA',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'OGRE',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'AVES',
+			function()
+		showPasswordUI()
+			end),
+		}),
+CAtext('FARM FITUR', '#C62828', '14sp'),
+CAswitch(
+		"FAST RESPAWN MOB",
+		function()
+	showPasswordUI()
+		end,
+		function()
+		
+		end
+		),
+CAbox({ 'DUPPE',
+
+			CAbutton(
+			'DUPPE BUFF',
+			function()
+		showPasswordUI()
+			end),
+			
+			CAbutton(
+			'DUPPE DROPT ITEM',
+			function()
+		showPasswordUI()
+			end),
+
+			CAbutton(
+			'DUPPE RUGIA',
+			function()
+		showPasswordUI()
+			end),
+		}),
+
+CAtext('AUTO FARM BUKAN AUTO LOOT'),
+CAbox({ 'AFK FOR FARM',
+
+			CAswitch(
+		"SETTA",
+		function()
+	showPasswordUI()
+		end,
+		function()
+		
+		end
+		),
+			CAswitch(
+		"EVEHOME",
+		function()
+	showPasswordUI()
+		end,
+		function()
+			
+		end
+		),
+
+			CAswitch(
+		"DEFINITION (Beta map 39)",
+		function()
+	showPasswordUI()
+		end,
+		function()
+			
+		end
+		),
+		}),
+		
+		CAtext('FITUR INI UNTUK  MENGAMBIL 3 REWARD SEUSAI DUNGEON'),
+CAbox({ 'AUTO COLLECT',
+
+			CAbutton(
+			'DUNGEON (NORMAL)',
+			function()
+		showPasswordUI()
+			end),
+			
+			CAbutton(
+			'DUNGEON (EVENT)',
+			function()
+		showPasswordUI()
+			end),
+
+			CAbutton(
+			'DUNGEON (GUILD MISION)',
+			function()
+		showPasswordUI()
+			end),
+		}),
+CAtext('SPESIAL FITUR', '#00796B', '14sp'),
+CAbox({ 'AUTO UPGRADE',
+
+			CAbutton(
+			'ORE ARMOR (112)',
+			function()
+			showPasswordUI()
+			end),
+
+			CAbutton(
+			'ORE ARMOR (115)',
+			function()
+		showPasswordUI()
+			end),
+		}),
+		CAbox({ 'VISUAL SKIN',
+
+			CAbutton(
+			'SKIN 1',
+			function()
+		showPasswordUI()
+			end),
+
+			CAbutton(
+			'SKIN 2',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 3',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 4',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 5',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 6',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 7',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 8',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 9',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 10',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 11',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 12',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 13',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 14',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 15',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 16',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 17',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 18',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 19',
+			function()
+		showPasswordUI()
+			end),
+			CAbutton(
+			'SKIN 20',
+			function()
+		showPasswordUI()
+			end),
+			
+		}),
+
+
+	}, { --4 Halaman Fitur
+CAtext('MUSIC CLOUD', '#00bfff', '14sp'),
+
+CAbox({ 'Music',
+
+			CAbutton(
+			'SAD SONGS',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-Music7")
+			end),
+			CAbutton(
+			'AKU CALON MANTU',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-Music5")
+			end),
+			CAbutton(
+			'UIAK IUK EPIC',
+			function()
+				gg.playMusic("https://files.catbox.moe/joyoq5.mp3")
+			end),
+			CAbutton(
+			'SHEILA ON 7',
+			function()
+				gg.playMusic("https://files.catbox.moe/vqw45a")
+			end),
+			CAbutton(
+			'KASIH ABA ABA',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-Music3")
+			end),
+			CAbutton(
+			'DJ PARTY FULL',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-Music-Dj-Party")
+			end),
+			CAbutton(
+			'DJ BAD BOYS',
+			function()
+				gg.playMusic("https://files.catbox.moe/747wbv.mp3")
+			end),
+			CAbutton(
+			'GARAM ATAU MADU',
+			function()
+				gg.playMusic("https://a.top4top.io/m_3380dnz4z0.mp3")
+			end),
+			CAbutton(
+			'SA JAUH SA TANAM',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-Music2")
+			end),
+			CAbutton(
+			'DJ LAMPU KAKA',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-Music1")
+			end),
+			CAbutton(
+			'KAU BUATKU MENANGIS PILU',
+			function()
+				gg.playMusic("https://vellix-Panel-Public.short.gy/Menganu-music")
+			end),
+			CAbutton(
+			'FALLING DOWN',
+			function()
+				gg.playMusic("https://j.top4top.io/m_33851y2g80.m4a")
+			end),
+			CAbutton(
+			'BBHC 1',
+			function()
+				gg.playMusic("https://h.top4top.io/m_3386qs1593.m4a")
+			end),
+			CAbutton(
+			'NENU BALENE',
+			function()
+				gg.playMusic("https://k.top4top.io/m_33866mkam4.m4a")
+			end),
+			CAbutton(
+			'DJ PERADABAN',
+			function()
+				gg.playMusic("https://files.catbox.moe/qamujm.mp3")
+			end),
+			CAbutton(
+			'V8 SEREM',
+			function()
+				gg.playMusic("https://pomf2.lain.la/f/zhhxa9nc.mp3")
+			end),
+			
+			CAbutton(
+			'DJ ODONGO',
+			function()
+				gg.playMusic("https://files.catbox.moe/4duha7.mp3")
+			end),
+		}),
+CAbutton(
+			'STOP MUSIC',
+			function()
+		gg.playMusic("stop")
+			end),
+
+
+
+	}, { --5 Halaman Pengaturan
+
+		CAbutton(
+		"Keluar",
+		function()
+			Lock.unUi()
+		end),
+
+
+
+	}, { --6 Halaman 6 (kosong)
+
+	},
+})
+
+Lock.Ui(invoke, nil, function(err) print(err) end)
+
