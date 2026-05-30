@@ -1,48 +1,116 @@
 --[[
-    ⚡ SIMPLE BOSS KILLER
-    Fix error handling
+    ⚡ WORLD BOSS INSTAKILL
+    Berdasarkan remote spy analysis
 ]]
 
-if getgenv().BK_Running then return end
-getgenv().BK_Running = true
+if getgenv().WBossKill then return end
+getgenv().WBossKill = true
+
+repeat task.wait() until game:IsLoaded()
 
 -- ══════════════════════════════════════════
 -- SERVICES
 -- ══════════════════════════════════════════
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local RS = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local LP = Players.LocalPlayer
 
 -- ══════════════════════════════════════════
--- AUTO FIND REMOTE
+-- REMOTES (dari spy)
 -- ══════════════════════════════════════════
-local AttackRemote = nil
+local Remotes = RS:FindFirstChild("Remotes")
+local AbilitySystem = RS:FindFirstChild("AbilitySystem")
 
-local function FindAttackRemote()
-    local function search(obj)
-        for _, v in pairs(obj:GetChildren()) do
-            if v:IsA("RemoteEvent") then
-                local name = v.Name:lower()
-                if name:find("hit") or name:find("m1") or name:find("attack") or name:find("damage") then
-                    return v
-                end
+local BossUIUpdate = Remotes and Remotes:FindFirstChild("BossUIUpdate")
+local RequestAbility = AbilitySystem and AbilitySystem:FindFirstChild("Remotes") and AbilitySystem.Remotes:FindFirstChild("RequestAbility")
+
+-- ══════════════════════════════════════════
+-- DATA BOSS
+-- ══════════════════════════════════════════
+local CurrentBoss = {
+    Name = nil,
+    MaxHP = 0,
+    CurrentHP = 0,
+    IsAlive = false,
+}
+
+-- Listen BossUIUpdate untuk tahu HP boss
+if BossUIUpdate then
+    BossUIUpdate.OnClientEvent:Connect(function(type, data)
+        if type == "Health" then
+            CurrentBoss.MaxHP = data.max
+            CurrentBoss.CurrentHP = data.current
+            CurrentBoss.IsAlive = data.current > 0
+        elseif type == "DamageStats" then
+            -- Update damage stats (opsional)
+            if data.yourPercent then
+                print("[IK] Your damage:", data.yourPercent, "%")
             end
-            local found = search(v)
-            if found then return found end
         end
-        return nil
-    end
-    return search(RS) or search(workspace)
+    end)
 end
 
-AttackRemote = FindAttackRemote()
+-- Listen boss mati
+local DeathRemote = Remotes and Remotes:FindFirstChild("ServerAnnouncement")
+if DeathRemote then
+    DeathRemote.OnClientEvent:Connect(function(msg, type)
+        if type == "WORLD_BOSS_DEATH" then
+            CurrentBoss.IsAlive = false
+            print("[IK] Boss defeated:", msg)
+        end
+    end)
+end
 
 -- ══════════════════════════════════════════
--- SIMPLE GUI
+-- KILL TRIGGER
+-- ══════════════════════════════════════════
+local Config = {
+    Active = true,
+    HPTrigger = 70,     -- Kill saat HP < 70%
+    AbilityID = 1,      -- Skill 1 (dari spy: Skill 1 di slot 1)
+}
+
+local KillTriggered = false
+local KillCount = 0
+
+-- Fungsi untuk trigger kill
+local function TriggerKill()
+    if not RequestAbility then
+        warn("[IK] RequestAbility remote not found!")
+        return false
+    end
+    
+    -- Kirim RequestAbility dengan damage besar
+    -- Dari spy, damage bisa 458B, jadi kita kirim damage besar
+    local success = false
+    
+    -- Method 1: Skill biasa
+    pcall(function()
+        RequestAbility:FireServer(Config.AbilityID)
+        success = true
+    end)
+    
+    -- Method 2: Skill dengan damage override
+    pcall(function()
+        RequestAbility:FireServer(Config.AbilityID, 999999999999)
+        success = true
+    end)
+    
+    -- Method 3: Skill dengan target + damage
+    pcall(function()
+        RequestAbility:FireServer(Config.AbilityID, LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") and LP.Character.HumanoidRootPart.Position)
+        success = true
+    end)
+    
+    return success
+end
+
+-- ══════════════════════════════════════════
+-- GUI
 -- ══════════════════════════════════════════
 local SG = Instance.new("ScreenGui")
-SG.Name = "BK"
+SG.Name = "WBossKill"
 SG.ResetOnSpawn = false
 pcall(function() SG.Parent = game:GetService("CoreGui") end)
 if not SG.Parent then
@@ -50,39 +118,87 @@ if not SG.Parent then
 end
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 140, 0, 60)
-Frame.Position = UDim2.new(1, -150, 0, 50)
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Frame.BackgroundTransparency = 0.2
+Frame.Size = UDim2.new(0, 190, 0, 85)
+Frame.Position = UDim2.new(0.5, -95, 0.05, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+Frame.BackgroundTransparency = 0.1
 Frame.BorderSizePixel = 0
 Frame.Parent = SG
-Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 10)
 
+-- Header
+local Header = Instance.new("TextLabel")
+Header.Size = UDim2.new(1, 0, 0, 25)
+Header.Text = "⚡ WORLD BOSS KILLER"
+Header.BackgroundTransparency = 1
+Header.TextColor3 = Color3.fromRGB(255, 70, 85)
+Header.TextSize = 11
+Header.Font = Enum.Font.GothamBold
+Header.Parent = Frame
+
+-- Status
 local Status = Instance.new("TextLabel")
-Status.Size = UDim2.new(1, -10, 0, 20)
-Status.Position = UDim2.new(0, 5, 0, 5)
-Status.Text = "Status: Idle"
+Status.Size = UDim2.new(1, -10, 0, 18)
+Status.Position = UDim2.new(0, 5, 0, 28)
+Status.Text = "● Monitoring boss..."
 Status.BackgroundTransparency = 1
-Status.TextColor3 = Color3.fromRGB(255, 255, 255)
-Status.TextSize = 11
-Status.Font = Enum.Font.GothamBold
+Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+Status.TextSize = 10
+Status.Font = Enum.Font.Gotham
 Status.TextXAlignment = Enum.TextXAlignment.Left
 Status.Parent = Frame
 
-local KillText = Instance.new("TextLabel")
-KillText.Size = UDim2.new(1, -10, 0, 15)
-KillText.Position = UDim2.new(0, 5, 0, 28)
-KillText.Text = "Kills: 0"
-KillText.BackgroundTransparency = 1
-KillText.TextColor3 = Color3.fromRGB(200, 200, 200)
-KillText.TextSize = 10
-KillText.Font = Enum.Font.Gotham
-KillText.TextXAlignment = Enum.TextXAlignment.Left
-KillText.Parent = Frame
+-- Boss HP Display
+local BossHP = Instance.new("TextLabel")
+BossHP.Size = UDim2.new(1, -10, 0, 15)
+BossHP.Position = UDim2.new(0, 5, 0, 44)
+BossHP.Text = "HP: -- / --"
+BossHP.BackgroundTransparency = 1
+BossHP.TextColor3 = Color3.fromRGB(200, 200, 200)
+BossHP.TextSize = 9
+BossHP.Font = Enum.Font.Gotham
+BossHP.TextXAlignment = Enum.TextXAlignment.Left
+BossHP.Parent = Frame
 
+-- Kill Counter
+local KillDisp = Instance.new("TextLabel")
+KillDisp.Size = UDim2.new(0, 60, 0, 15)
+KillDisp.Position = UDim2.new(1, -65, 0, 44)
+KillDisp.Text = "💀 0"
+KillDisp.BackgroundTransparency = 1
+KillDisp.TextColor3 = Color3.fromRGB(255, 70, 85)
+KillDisp.TextSize = 10
+KillDisp.Font = Enum.Font.GothamBold
+KillDisp.TextXAlignment = Enum.TextXAlignment.Right
+KillDisp.Parent = Frame
+
+-- HP Trigger Input
+local HpBox = Instance.new("TextBox")
+HpBox.Size = UDim2.new(0, 50, 0, 22)
+HpBox.Position = UDim2.new(0, 5, 1, -28)
+HpBox.Text = "70"
+HpBox.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+HpBox.TextColor3 = Color3.fromRGB(255, 200, 100)
+HpBox.TextSize = 10
+HpBox.Font = Enum.Font.GothamBold
+HpBox.BorderSizePixel = 0
+HpBox.Parent = Frame
+Instance.new("UICorner", HpBox).CornerRadius = UDim.new(0, 5)
+
+local HpLabel = Instance.new("TextLabel")
+HpLabel.Size = UDim2.new(0, 40, 0, 15)
+HpLabel.Position = UDim2.new(0, 60, 1, -26)
+HpLabel.Text = "HP%"
+HpLabel.BackgroundTransparency = 1
+HpLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+HpLabel.TextSize = 9
+HpLabel.Font = Enum.Font.Gotham
+HpLabel.Parent = Frame
+
+-- Toggle Button
 local Toggle = Instance.new("TextButton")
-Toggle.Size = UDim2.new(0, 50, 0, 22)
-Toggle.Position = UDim2.new(1, -55, 1, -27)
+Toggle.Size = UDim2.new(0, 55, 0, 24)
+Toggle.Position = UDim2.new(1, -60, 1, -28)
 Toggle.Text = "ON"
 Toggle.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -90,131 +206,119 @@ Toggle.TextSize = 11
 Toggle.Font = Enum.Font.GothamBold
 Toggle.BorderSizePixel = 0
 Toggle.Parent = Frame
-Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 4)
-
--- ══════════════════════════════════════════
--- VARIABLES
--- ══════════════════════════════════════════
-local Active = true
-local Kills = 0
-local LastAttack = 0
-local AttackDelay = 0.05
-
--- ══════════════════════════════════════════
--- FIND BOSS
--- ══════════════════════════════════════════
-local function FindBoss()
-    local char = LP.Character
-    if not char then return nil end
-    
-    local myRoot = char:FindFirstChild("HumanoidRootPart")
-    if not myRoot then return nil end
-    
-    local target = nil
-    local minDist = 1000
-    
-    -- Cari semua Humanoid yang bukan player
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("Humanoid") and v.Health > 0 and v.Parent ~= char then
-            local root = v.Parent:FindFirstChild("HumanoidRootPart") or v.Parent:FindFirstChild("Head")
-            if root then
-                -- Cek apakah ini boss (MaxHealth besar)
-                if v.MaxHealth >= 100000 then
-                    local dist = (myRoot.Position - root.Position).Magnitude
-                    if dist < minDist then
-                        minDist = dist
-                        target = {hum = v, root = root}
-                    end
-                end
-            end
-        end
-    end
-    
-    return target
-end
-
--- ══════════════════════════════════════════
--- ATTACK
--- ══════════════════════════════════════════
-local function Attack(pos)
-    if not AttackRemote then
-        AttackRemote = FindAttackRemote()
-        if not AttackRemote then 
-            Status.Text = "Remote not found!"
-            return false 
-        end
-    end
-    
-    if tick() - LastAttack < AttackDelay then 
-        return false 
-    end
-    
-    local success = false
-    pcall(function()
-        AttackRemote:FireServer(pos)
-        success = true
-    end)
-    
-    if success then
-        LastAttack = tick()
-    end
-    
-    return success
-end
+Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
 
 -- ══════════════════════════════════════════
 -- MAIN LOOP
 -- ══════════════════════════════════════════
-RunService.Heartbeat:Connect(function()
-    if not Active then 
-        if Status.Text ~= "Status: OFF" then
-            Status.Text = "Status: OFF"
-        end
-        return 
-    end
-    
-    local boss = FindBoss()
-    
-    if boss then
-        local hpPercent = (boss.hum.Health / boss.hum.MaxHealth) * 100
-        Status.Text = string.format("⚔ HP: %.1f%%", hpPercent)
+local function UpdateDisplay()
+    if CurrentBoss.MaxHP > 0 then
+        local hpPercent = (CurrentBoss.CurrentHP / CurrentBoss.MaxHP) * 100
+        BossHP.Text = string.format("HP: %s / %s (%.1f%%)", 
+            tostring(CurrentBoss.CurrentHP):sub(1, 12), 
+            tostring(CurrentBoss.MaxHP):sub(1, 12),
+            hpPercent)
         
-        -- Attack jika HP < 90%
-        if hpPercent < 90 then
-            Attack(boss.root.Position)
-        end
+        Status.Text = string.format("⚡ Boss HP: %.1f%%", hpPercent)
         
-        -- Cek apakah mati
-        if boss.hum.Health <= 0 then
-            Kills = Kills + 1
-            KillText.Text = "Kills: " .. Kills
-            Status.Text = "💀 KILLED!"
-            task.wait(1)
+        -- CEK KILL CONDITION
+        if Config.Active and not KillTriggered and CurrentBoss.IsAlive then
+            if hpPercent < Config.HPTrigger then
+                Status.Text = "💀 TRIGGERING KILL..."
+                Status.TextColor3 = Color3.fromRGB(255, 70, 85)
+                
+                local success = TriggerKill()
+                
+                if success then
+                    KillTriggered = true
+                    Status.Text = "✓ KILL TRIGGER SENT!"
+                    
+                    -- Tunggu konfirmasi mati
+                    task.wait(2)
+                    if not CurrentBoss.IsAlive then
+                        KillCount = KillCount + 1
+                        KillDisp.Text = "💀 " .. KillCount
+                        Status.Text = "✅ BOSS KILLED!"
+                        Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+                        KillTriggered = false
+                    end
+                else
+                    Status.Text = "✗ TRIGGER FAILED"
+                    Status.TextColor3 = Color3.fromRGB(255, 70, 85)
+                end
+            end
         end
     else
-        Status.Text = "🔍 Looking for boss..."
+        BossHP.Text = "HP: Waiting for boss..."
+        if not KillTriggered then
+            Status.Text = "🔍 Waiting for world boss..."
+            Status.TextColor3 = Color3.fromRGB(150, 150, 150)
+        end
+    end
+end
+
+-- Update setiap detik (biar ga terlalu berat)
+task.spawn(function()
+    while getgenv().WBossKill do
+        UpdateDisplay()
+        task.wait(0.5)
     end
 end)
 
+-- Reset trigger saat boss mati
+if DeathRemote then
+    DeathRemote.OnClientEvent:Connect(function(msg, type)
+        if type == "WORLD_BOSS_DEATH" then
+            KillTriggered = false
+            CurrentBoss.IsAlive = false
+            -- Reset HP display setelah boss mati
+            task.wait(3)
+            CurrentBoss.MaxHP = 0
+            CurrentBoss.CurrentHP = 0
+        end
+    end)
+end
+
+-- Reset trigger saat boss UI hilang (boss mati/respawn)
+local BossUIHide = Remotes and Remotes:FindFirstChild("BossUIHide")
+if BossUIHide then
+    BossUIHide.OnClientEvent:Connect(function()
+        KillTriggered = false
+        CurrentBoss.IsAlive = false
+        task.wait(2)
+        CurrentBoss.MaxHP = 0
+        CurrentBoss.CurrentHP = 0
+    end)
+end
+
 -- ══════════════════════════════════════════
--- TOGGLE BUTTON
+-- UI CALLBACKS
 -- ══════════════════════════════════════════
 Toggle.MouseButton1Click:Connect(function()
-    Active = not Active
-    if Active then
+    Config.Active = not Config.Active
+    if Config.Active then
         Toggle.Text = "ON"
         Toggle.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-        Status.Text = "Status: ON"
+        Status.Text = "● ACTIVE"
+        Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+        KillTriggered = false
     else
         Toggle.Text = "OFF"
-        Toggle.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-        Status.Text = "Status: OFF"
+        Toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        Status.Text = "● OFF"
+        Status.TextColor3 = Color3.fromRGB(150, 150, 150)
     end
 end)
 
--- ══════════════════════════════════════════
--- DRAG GUI
--- ══════════════════════════════════════════
+HpBox.FocusLost:Connect(function()
+    local val = tonumber(HpBox.Text)
+    if val and val >= 1 and val <= 100 then
+        Config.HPTrigger = val
+    end
+    HpBox.Text = tostring(Config.HPTrigger)
+end)
+
+-- Drag GUI
 local drag = {active = false, startPos = nil, startMouse = nil}
 Frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -242,11 +346,20 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 -- ══════════════════════════════════════════
--- PRINT STATUS
+-- PRINT INFO
 -- ══════════════════════════════════════════
-print("[BOSS KILLER] Loaded!")
-if AttackRemote then
-    print("[BOSS KILLER] Remote found: " .. AttackRemote.Name)
-else
-    warn("[BOSS KILLER] No attack remote found!")
-end
+print("════════════════════════════════════════")
+print("⚡ WORLD BOSS INSTAKILL v2")
+print("════════════════════════════════════════")
+print("Remotes detected:")
+print("  - BossUIUpdate:", BossUIUpdate ~= nil)
+print("  - RequestAbility:", RequestAbility ~= nil)
+print("  - ServerAnnouncement:", DeathRemote ~= nil)
+print("")
+print("Settings:")
+print("  - HP Trigger:", Config.HPTrigger, "%")
+print("  - Ability ID:", Config.AbilityID, "(Skill 1)")
+print("════════════════════════════════════════")
+print("Script akan otomatis kill boss saat HP <", Config.HPTrigger, "%")
+print("Klik ON/OFF untuk mengaktifkan")
+print("════════════════════════════════════════")
