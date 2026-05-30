@@ -1,0 +1,392 @@
+--[[
+    ⚡ BOSS AUTO KILLER + TIMER
+    - Baca timer dari BossTimerSync
+    - Auto attack pas boss spawn
+    - Optimized untuk PC/Mobile
+]]
+
+if getgenv().BossKiller_Running then 
+    warn("[BK] Already running!") 
+    return 
+end
+getgenv().BossKiller_Running = true
+
+repeat task.wait() until game:IsLoaded()
+
+-- ══════════════════════════════════════════
+-- SERVICES
+-- ══════════════════════════════════════════
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local RS = game:GetService("ReplicatedStorage")
+local LP = Players.LocalPlayer
+local PlrGui = LP:WaitForChild("PlayerGui")
+
+-- ══════════════════════════════════════════
+-- REMOTES (AUTO DETECT)
+-- ══════════════════════════════════════════
+local AttackRemote = nil
+local AttackMethods = {}
+
+-- Scan semua remote
+local function ScanRemotes()
+    local remotes = {}
+    local function scan(obj, depth)
+        if depth > 5 then return end
+        for _, v in pairs(obj:GetChildren()) do
+            if v:IsA("RemoteEvent") or v:IsA("RemoteFunction") then
+                table.insert(remotes, v)
+            elseif v:IsA("Folder") or v:IsA("Model") then
+                scan(v, depth + 1)
+            end
+        end
+    end
+    scan(RS, 0)
+    scan(workspace, 0)
+    return remotes
+end
+
+local AllRemotes = ScanRemotes()
+print("[BK] Total remotes found: " .. #AllRemotes)
+
+-- Cari remote attack
+for _, r in pairs(AllRemotes) do
+    local name = r.Name:lower()
+    if name:find("hit") or name:find("m1") or name:find("attack") or name:find("damage") then
+        AttackRemote = r
+        print("[BK] Found attack remote: " .. r:GetFullName())
+        break
+    end
+end
+
+-- ══════════════════════════════════════════
+-- BOSS TIMER (dari GUI yang sudah ada)
+-- ══════════════════════════════════════════
+local BossTimerGui = nil
+local BossCards = {} -- {bossName = {isAlive, timerLabel, barFill}}
+
+-- Cari GUI Boss Timer yang sudah ada
+for _, gui in pairs({game:GetService("CoreGui"), PlrGui}) do
+    local bt = gui:FindFirstChild("BT2")
+    if bt then
+        BossTimerGui = bt
+        break
+    end
+end
+
+if not BossTimerGui then
+    warn("[BK] Boss Timer GUI not found! Creating alternative...")
+    -- Kita buat sendiri atau scan manual
+end
+
+-- Fungsi baca status boss dari GUI Timer
+local function GetBossStatus()
+    local bosses = {}
+    if BossTimerGui then
+        local body = BossTimerGui:FindFirstChild("P"):FindFirstChild("Body")
+        if body then
+            for _, card in pairs(body:GetChildren()) do
+                if card:IsA("Frame") and card.Name ~= "UIListLayout" and card.Name ~ tostring(card:FindFirstChildOfClass("UIListLayout")) then
+                    -- Parse dari card
+                    local nameLabel = card:FindFirstChildOfClass("TextLabel")
+                    local timerLabel = nil
+                    local barFill = nil
+                    
+                    for _, v in pairs(card:GetChildren()) do
+                        if v:IsA("TextLabel") and v.TextSize == 15 then
+                            timerLabel = v
+                        end
+                        if v:IsA("Frame") and v:FindFirstChildOfClass("Frame") then
+                            barFill = v:FindFirstChildOfClass("Frame")
+                        end
+                    end
+                    
+                    if nameLabel and timerLabel then
+                        local isAlive = timerLabel.Text == "LIVE"
+                        bosses[nameLabel.Text] = {
+                            isAlive = isAlive,
+                            timer = timerLabel.Text,
+                            barFill = barFill
+                        }
+                    end
+                end
+            end
+        end
+    end
+    return bosses
+end
+
+-- ══════════════════════════════════════════
+-- FIND BOSS IN WORKSPACE
+-- ══════════════════════════════════════════
+local function FindBossInWorkspace()
+    local char = LP.Character
+    if not char then return nil end
+    
+    local myRoot = char:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return nil end
+    
+    -- Cari di berbagai folder
+    local npcFolders = {
+        workspace:FindFirstChild("NPCs"),
+        workspace:FindFirstChild("Mobs"),
+        workspace:FindFirstChild("Enemies"),
+        workspace:FindFirstChild("Bosses"),
+    }
+    
+    for _, folder in pairs(npcFolders) do
+        if folder then
+            for _, npc in pairs(folder:GetChildren()) do
+                if npc:IsA("Model") then
+                    local hum = npc:FindFirstChildOfClass("Humanoid")
+                    local root = npc:FindFirstChild("HumanoidRootPart")
+                    if hum and root and hum.Health > 0 then
+                        -- Cek apakah ini boss (MaxHP tinggi)
+                        if hum.MaxHealth >= 1000000 then
+                            return npc, hum, root
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Fallback: cari semua model dengan Humanoid & MaxHealth besar
+    for _, npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") and npc.Parent ~= LP.Character then
+            local hum = npc:FindFirstChildOfClass("Humanoid")
+            local root = npc:FindFirstChild("HumanoidRootPart")
+            if hum and root and hum.Health > 0 and hum.MaxHealth >= 1000000 then
+                return npc, hum, root
+            end
+        end
+    end
+    
+    return nil
+end
+
+-- ══════════════════════════════════════════
+-- ATTACK FUNCTION
+-- ══════════════════════════════════════════
+local LastAttack = 0
+local AttackDelay = 0.05 -- 50ms antara attack (lebih cepat)
+
+local function AttackTarget(targetRoot)
+    if not AttackRemote then 
+        -- Coba lagi cari remote
+        AllRemotes = ScanRemotes()
+        for _, r in pairs(AllRemotes) do
+            local name = r.Name:lower()
+            if name:find("hit") or name:find("m1") or name:find("attack") then
+                AttackRemote = r
+                break
+            end
+        end
+        if not AttackRemote then return false end
+    end
+    
+    if tick() - LastAttack < AttackDelay then return false end
+    
+    local targetPos = targetRoot.Position
+    local success = false
+    
+    -- Coba berbagai metode
+    pcall(function()
+        AttackRemote:FireServer(targetPos)
+        success = true
+    end)
+    
+    pcall(function()
+        AttackRemote:FireServer(targetPos, 999999999)
+        success = true
+    end)
+    
+    pcall(function()
+        AttackRemote:FireServer(targetRoot.Parent, targetPos)
+        success = true
+    end)
+    
+    if success then
+        LastAttack = tick()
+    end
+    
+    return success
+end
+
+-- ══════════════════════════════════════════
+-- MAIN LOOP
+-- ══════════════════════════════════════════
+local Active = true
+local CurrentTarget = nil
+
+-- GUI Sederhana
+local SG = Instance.new("ScreenGui")
+SG.Name = "BossKillerUI"
+SG.ResetOnSpawn = false
+pcall(function() SG.Parent = game:GetService("CoreGui") end)
+pcall(function() SG.Parent = LP.PlayerGui end)
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 150, 0, 80)
+MainFrame.Position = UDim2.new(1, -160, 0, 100)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = SG
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -10, 0, 20)
+StatusLabel.Position = UDim2.new(0, 5, 0, 5)
+StatusLabel.Text = "🔍 Scanning..."
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+StatusLabel.TextSize = 11
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.Parent = MainFrame
+
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 60, 0, 25)
+ToggleBtn.Position = UDim2.new(0.5, -30, 1, -30)
+ToggleBtn.Text = "OFF"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.TextSize = 12
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.BorderSizePixel = 0
+ToggleBtn.Parent = MainFrame
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 4)
+
+local KillCount = 0
+local KillLabel = Instance.new("TextLabel")
+KillLabel.Size = UDim2.new(1, -10, 0, 15)
+KillLabel.Position = UDim2.new(0, 5, 0, 28)
+KillLabel.Text = "💀 Kills: 0"
+KillLabel.BackgroundTransparency = 1
+KillLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+KillLabel.TextSize = 10
+KillLabel.Font = Enum.Font.Gotham
+KillLabel.Parent = MainFrame
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    Active = not Active
+    if Active then
+        ToggleBtn.Text = "ON"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        StatusLabel.Text = "✅ ACTIVE"
+    else
+        ToggleBtn.Text = "OFF"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        StatusLabel.Text = "⏸ PAUSED"
+    end
+end)
+
+-- Drag GUI
+local dragging = false
+local dragStart, startPos
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if not dragging then return end
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- ══════════════════════════════════════════
+-- HEARTBEAT LOOP
+-- ══════════════════════════════════════════
+local Attacking = false
+
+RunService.Heartbeat:Connect(function()
+    if not Active then return end
+    
+    -- Cek status boss dari Timer GUI
+    local bossStatus = GetBossStatus()
+    local hasLiveBoss = false
+    
+    for name, info in pairs(bossStatus) do
+        if info.isAlive then
+            hasLiveBoss = true
+            StatusLabel.Text = "⚔ FIGHTING: " .. name
+            break
+        end
+    end
+    
+    if hasLiveBoss then
+        -- Cari boss di workspace
+        local boss, hum, root = FindBossInWorkspace()
+        
+        if boss and root then
+            -- Attack!
+            AttackTarget(root)
+            
+            -- Cek apakah boss sudah mati
+            if hum and hum.Health <= 0 then
+                KillCount = KillCount + 1
+                KillLabel.Text = "💀 Kills: " .. KillCount
+                StatusLabel.Text = "💀 BOSS KILLED!"
+                task.wait(1)
+            end
+        else
+            -- Boss terdeteksi di timer tapi belum muncul di workspace
+            StatusLabel.Text = "⏳ Waiting boss spawn..."
+        end
+    else
+        -- Cek langsung ke workspace juga
+        local boss, hum, root = FindBossInWorkspace()
+        if boss then
+            StatusLabel.Text = "⚔ BOSS FOUND!"
+            AttackTarget(root)
+        else
+            -- Tampilkan timer dari GUI
+            local timerText = "No boss active"
+            if BossTimerGui then
+                local panel = BossTimerGui:FindFirstChild("P")
+                if panel then
+                    local body = panel:FindFirstChild("Body")
+                    if body then
+                        for _, card in pairs(body:GetChildren()) do
+                            if card:IsA("Frame") then
+                                local timer = card:FindFirstChildOfClass("TextLabel")
+                                if timer and timer.TextSize == 15 and timer.Text ~= "LIVE" and timer.Text ~= "--:--" then
+                                    timerText = "Respawning: " .. timer.Text
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            StatusLabel.Text = timerText
+        end
+    end
+end)
+
+print("[BK] Boss Killer Loaded!")
+print("[BK] Attack Remote: " .. (AttackRemote and AttackRemote.Name or "NOT FOUND"))
+
+-- Instruction
+print([[
+
+╔════════════════════════════════════════╗
+║     BOSS KILLER + TIMER ACTIVE         ║
+╠════════════════════════════════════════╣
+║  GUI di pojok kanan atas               ║
+║  Klik ON untuk mulai                   ║
+║  Akan auto attack saat boss spawn      ║
+╚════════════════════════════════════════╝
+
+]])
