@@ -26,20 +26,22 @@ local LP = Players.LocalPlayer
 local RequestHit = nil
 local CombatSystem = RS:FindFirstChild("CombatSystem")
 if CombatSystem then
-    local Remotes = CombatSystem:FindFirstChild("Remotes")
-    if Remotes then
-        RequestHit = Remotes:FindFirstChild("RequestHit")
+    local CombatRemotes = CombatSystem:FindFirstChild("Remotes")
+    if CombatRemotes then
+        RequestHit = CombatRemotes:FindFirstChild("RequestHit")
     end
 end
 
 if not RequestHit then
     for _, v in pairs(RS:GetDescendants()) do
-        if v.Name == "RequestHit" then
+        if v.Name == "RequestHit" and v:IsA("RemoteEvent") then
             RequestHit = v
             break
         end
     end
 end
+
+print("[IK] RequestHit found:", RequestHit ~= nil)
 
 -- ══════════════════════════════════════════
 -- CARI UI DirectKill YANG SUDAH ADA
@@ -72,123 +74,114 @@ if not SG then
     end
 end
 
--- Jika UI belum ada, buat baru (sekali aja)
-if not SG then
-    SG = Instance.new("ScreenGui")
-    SG.Name = "DirectKill"
-    SG.ResetOnSpawn = false
-    pcall(function() SG.Parent = game:GetService("CoreGui") end)
-    if not SG.Parent then
-        pcall(function() SG.Parent = LP:WaitForChild("PlayerGui") end)
-    end
-    
-    Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 180, 0, 70)
-    Frame.Position = UDim2.new(1, -190, 0, 100)
-    Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
-    Frame.BackgroundTransparency = 0.15
-    Frame.BorderSizePixel = 0
-    Frame.Parent = SG
-    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
-    
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 25)
-    Title.Text = "⚡ DIRECT KILL"
-    Title.BackgroundTransparency = 1
-    Title.TextColor3 = Color3.fromRGB(255, 70, 85)
-    Title.TextSize = 12
-    Title.Font = Enum.Font.GothamBold
-    Title.Parent = Frame
-    
-    Status = Instance.new("TextLabel")
-    Status.Size = UDim2.new(1, -10, 0, 18)
-    Status.Position = UDim2.new(0, 5, 0, 28)
-    Status.Text = "● Waiting for boss..."
-    Status.BackgroundTransparency = 1
-    Status.TextColor3 = Color3.fromRGB(100, 255, 100)
-    Status.TextSize = 10
-    Status.Font = Enum.Font.Gotham
-    Status.TextXAlignment = Enum.TextXAlignment.Left
-    Status.Parent = Frame
-    
-    KillDisp = Instance.new("TextLabel")
-    KillDisp.Size = UDim2.new(0, 60, 0, 18)
-    KillDisp.Position = UDim2.new(1, -65, 0, 28)
-    KillDisp.Text = "💀 0"
-    KillDisp.BackgroundTransparency = 1
-    KillDisp.TextColor3 = Color3.fromRGB(255, 70, 85)
-    KillDisp.TextSize = 11
-    KillDisp.Font = Enum.Font.GothamBold
-    KillDisp.TextXAlignment = Enum.TextXAlignment.Right
-    KillDisp.Parent = Frame
-    
-    Toggle = Instance.new("TextButton")
-    Toggle.Size = UDim2.new(0, 50, 0, 24)
-    Toggle.Position = UDim2.new(1, -55, 1, -28)
-    Toggle.Text = "ON"
-    Toggle.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Toggle.TextSize = 11
-    Toggle.Font = Enum.Font.GothamBold
-    Toggle.BorderSizePixel = 0
-    Toggle.Parent = Frame
-    Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
-    
-    HpBox = Instance.new("TextBox")
-    HpBox.Size = UDim2.new(0, 50, 0, 22)
-    HpBox.Position = UDim2.new(0, 5, 1, -28)
-    HpBox.Text = "80"
-    HpBox.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    HpBox.TextColor3 = Color3.fromRGB(255, 200, 100)
-    HpBox.TextSize = 10
-    HpBox.Font = Enum.Font.GothamBold
-    HpBox.BorderSizePixel = 0
-    HpBox.Parent = Frame
-    Instance.new("UICorner", HpBox).CornerRadius = UDim.new(0, 5)
-    
-    -- Drag
-    local drag = {active = false, startPos = nil, startMouse = nil}
-    Frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            drag.active = true
-            drag.startPos = Frame.Position
-            drag.startMouse = input.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    drag.active = false
-                end
-            end)
-        end
-    end)
-    
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if drag.active and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - drag.startMouse
-            Frame.Position = UDim2.new(
-                drag.startPos.X.Scale,
-                drag.startPos.X.Offset + delta.X,
-                drag.startPos.Y.Scale,
-                drag.startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-else
-    -- Cari komponen di UI yang sudah ada
-    Frame = SG:FindFirstChildOfClass("Frame") or SG:FindFirstChild("P") or SG:FindFirstChild("IKMain")
-    if Frame then
-        for _, v in pairs(Frame:GetDescendants()) do
-            if v:IsA("TextLabel") and v.Text and v.Text:find("💀") then
-                KillDisp = v
-            elseif v:IsA("TextLabel") and v.Text and (v.Text:find("HP") or v.Text:find("Waiting")) then
-                Status = v
-            elseif v:IsA("TextButton") and v.Text == "ON" or v.Text == "OFF" then
-                Toggle = v
-            elseif v:IsA("TextBox") then
-                HpBox = v
-            end
-        end
-    end
+-- HAPUS UI LAMA (biar bersih)
+if SG then
+    SG:Destroy()
+    SG = nil
 end
+
+-- BUAT UI BARU (SEKALI SAJA)
+SG = Instance.new("ScreenGui")
+SG.Name = "DirectKill"
+SG.ResetOnSpawn = false
+pcall(function() SG.Parent = game:GetService("CoreGui") end)
+if not SG.Parent then
+    pcall(function() SG.Parent = LP:WaitForChild("PlayerGui") end)
+end
+
+Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 180, 0, 70)
+Frame.Position = UDim2.new(1, -190, 0, 100)
+Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+Frame.BackgroundTransparency = 0.15
+Frame.BorderSizePixel = 0
+Frame.Parent = SG
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 25)
+Title.Text = "⚡ DIRECT KILL"
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 70, 85)
+Title.TextSize = 12
+Title.Font = Enum.Font.GothamBold
+Title.Parent = Frame
+
+Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, -10, 0, 18)
+Status.Position = UDim2.new(0, 5, 0, 28)
+Status.Text = "● Waiting for boss..."
+Status.BackgroundTransparency = 1
+Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+Status.TextSize = 10
+Status.Font = Enum.Font.Gotham
+Status.TextXAlignment = Enum.TextXAlignment.Left
+Status.Parent = Frame
+
+KillDisp = Instance.new("TextLabel")
+KillDisp.Size = UDim2.new(0, 60, 0, 18)
+KillDisp.Position = UDim2.new(1, -65, 0, 28)
+KillDisp.Text = "💀 0"
+KillDisp.BackgroundTransparency = 1
+KillDisp.TextColor3 = Color3.fromRGB(255, 70, 85)
+KillDisp.TextSize = 11
+KillDisp.Font = Enum.Font.GothamBold
+KillDisp.TextXAlignment = Enum.TextXAlignment.Right
+KillDisp.Parent = Frame
+
+Toggle = Instance.new("TextButton")
+Toggle.Size = UDim2.new(0, 50, 0, 24)
+Toggle.Position = UDim2.new(1, -55, 1, -28)
+Toggle.Text = "ON"
+Toggle.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+Toggle.TextSize = 11
+Toggle.Font = Enum.Font.GothamBold
+Toggle.BorderSizePixel = 0
+Toggle.Parent = Frame
+Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
+
+HpBox = Instance.new("TextBox")
+HpBox.Size = UDim2.new(0, 50, 0, 22)
+HpBox.Position = UDim2.new(0, 5, 1, -28)
+HpBox.Text = "80"
+HpBox.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+HpBox.TextColor3 = Color3.fromRGB(255, 200, 100)
+HpBox.TextSize = 10
+HpBox.Font = Enum.Font.GothamBold
+HpBox.BorderSizePixel = 0
+HpBox.Parent = Frame
+Instance.new("UICorner", HpBox).CornerRadius = UDim.new(0, 5)
+
+-- Drag GUI
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
 
 -- ══════════════════════════════════════════
 -- VARIABLES
@@ -196,7 +189,7 @@ end
 local Config = {
     Active = true,
     HPTrigger = 80,
-    BossMinHP = 100000000,
+    BossMinHP = 10000000,
     M1Delay = 0.05,
 }
 
@@ -204,7 +197,6 @@ local State = {
     Kills = 0,
     LastHit = 0,
     KillTriggered = false,
-    CurrentBoss = nil,
 }
 
 -- ══════════════════════════════════════════
@@ -218,8 +210,8 @@ local CurrentBossHP = 0
 local CurrentBossMaxHP = 0
 
 if BossUIUpdate then
-    BossUIUpdate.OnClientEvent:Connect(function(type, data)
-        if type == "Health" then
+    BossUIUpdate.OnClientEvent:Connect(function(typ, data)
+        if typ == "Health" then
             CurrentBossMaxHP = data.max
             CurrentBossHP = data.current
         end
@@ -227,8 +219,8 @@ if BossUIUpdate then
 end
 
 if ServerAnnouncement then
-    ServerAnnouncement.OnClientEvent:Connect(function(msg, type)
-        if type == "WORLD_BOSS_DEATH" or string.find(msg, "defeated") then
+    ServerAnnouncement.OnClientEvent:Connect(function(msg, typ)
+        if typ == "WORLD_BOSS_DEATH" or string.find(msg, "defeated") then
             State.KillTriggered = false
             State.Kills = State.Kills + 1
             if KillDisp then KillDisp.Text = "💀 " .. State.Kills end
@@ -240,11 +232,16 @@ if ServerAnnouncement then
 end
 
 -- ══════════════════════════════════════════
--- SEND M1 HIT
+-- SEND M1 HIT (FIX ERROR LINE 184)
 -- ══════════════════════════════════════════
 local function SendM1(targetPos)
-    if not RequestHit then return false end
-    if tick() - State.LastHit < Config.M1Delay then return false end
+    if not RequestHit then 
+        return false 
+    end
+    
+    if tick() - State.LastHit < Config.M1Delay then 
+        return false 
+    end
     
     local success = false
     pcall(function()
@@ -268,7 +265,7 @@ RunService.Heartbeat:Connect(function()
         return 
     end
     
-    -- Hitung persen HP boss
+    -- Cek apakah ada boss dari UI update
     if CurrentBossMaxHP > 0 and CurrentBossHP > 0 then
         local hpPercent = (CurrentBossHP / CurrentBossMaxHP) * 100
         
@@ -291,7 +288,8 @@ RunService.Heartbeat:Connect(function()
             local bossFound = false
             for _, obj in pairs(workspace:GetDescendants()) do
                 if obj:IsA("Humanoid") and obj.MaxHealth >= Config.BossMinHP and obj.Health > 0 then
-                    local root = obj.Parent and (obj.Parent:FindFirstChild("HumanoidRootPart") or obj.Parent:FindFirstChild("Head"))
+                    local bossModel = obj.Parent
+                    local root = bossModel and (bossModel:FindFirstChild("HumanoidRootPart") or bossModel:FindFirstChild("Head"))
                     if root then
                         -- SPAM M1 10x CEPAT
                         for i = 1, 10 do
@@ -323,7 +321,7 @@ RunService.Heartbeat:Connect(function()
 end)
 
 -- ══════════════════════════════════════════
--- UI CALLBACKS (jika komponen ada)
+-- UI CALLBACKS
 -- ══════════════════════════════════════════
 if Toggle then
     Toggle.MouseButton1Click:Connect(function()
@@ -357,7 +355,7 @@ end
 print("════════════════════════════════════════")
 print("⚡ INSTAKILL - UI DirectKill UPDATED")
 print("════════════════════════════════════════")
-print("RequestHit:", RequestHit and "✓" or "✗")
+print("RequestHit:", RequestHit and "✓ FOUND" or "✗ NOT FOUND")
 print("HP Trigger:", Config.HPTrigger, "%")
 print("Method: Spam M1 10x saat HP < trigger")
 print("════════════════════════════════════════")
